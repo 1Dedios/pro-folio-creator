@@ -1,0 +1,25 @@
+{
+  "name": "profolio-final-project",
+  "version": "1.0.0",
+  "description": "profolio final project for cs-546",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node app.js",
+    "seed": "node tasks/seed.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/1Dedios/pro-folio-creator.git"
+  },
+  "author": "Kent Berry, Alec Kritta, Eddie Padilla, Dave Shoenfelt, Kartik Pantula",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/1Dedios/pro-folio-creator/issues"
+  },
+  "homepage": "https://github.com/1Dedios/pro-folio-creator#readme",
+  "dependencies": {
+    "express": "^5.1.0",
+    "mongodb": "^7.0.0"
+  }
+}
