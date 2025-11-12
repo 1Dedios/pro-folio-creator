@@ -1,4 +1,4 @@
-import { ObjectId } from 'mongodb';
+import {ObjectId} from 'mongodb';
 
 // String validation
 export const validateString = (str, paramName) => {
@@ -60,15 +60,6 @@ export const validateArray = (arr, paramName, validateFn) => {
   return arr;
 };
 
-// Rating validation (1-5)
-export const validateRating = (rating, paramName) => {
-  if (rating === undefined || rating === null) throw `${paramName || 'Rating'} must be provided`;
-  if (typeof rating !== 'number') throw `${paramName || 'Rating'} must be a number`;
-  if (isNaN(rating)) throw `${paramName || 'Rating'} is not a valid number`;
-  if (rating < 1 || rating > 5) throw `${paramName || 'Rating'} must be between 1 and 5`;
-  return rating;
-};
-
 // Email validation
 export const validateEmail = (email, paramName) => {
   email = validateString(email, paramName || 'Email');
@@ -105,12 +96,4 @@ export const validateBoolean = (bool, paramName) => {
   if (bool === undefined || bool === null) throw `${paramName || 'Boolean'} must be provided`;
   if (typeof bool !== 'boolean') throw `${paramName || 'Parameter'} must be a boolean`;
   return bool;
-};
-
-// Runtime validation (for movies)
-export const validateRuntime = (runtime, paramName) => {
-  runtime = validateString(runtime, paramName || 'Runtime');
-  const runtimeRegex = /^(\d+)h (\d+)min$/;
-  if (!runtimeRegex.test(runtime)) throw `${paramName || 'Runtime'} must be in the format 'Xh Ymin'`;
-  return runtime;
 };
