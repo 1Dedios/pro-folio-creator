@@ -1,24 +1,22 @@
-import express from 'express';
-import {messages, portfolios, themes, users} from '../data/index.js';
-import pagesRouter from './pages.js';
-import usersRouter from './users.js';
-import privateRoutes from './private.js';
+import express from "express";
+import { users, messages, themes, portfolios } from "../data/index.js";
+import contactFormRoute from "./contactForm.js";
+import pagesRouter from "./pages.js";
 
 const apiRouter = express.Router();
 
 // User routes
-// moved to routes/users.js
-/*router.get('/users/:id', async (req, res) => {
+router.get("/users/:id", async (req, res) => {
   try {
     const user = await users.getUserById(req.params.id);
     res.json(user);
   } catch (e) {
     res.status(404).json({ error: e });
   }
-});*/
+});
 
 // Theme routes
-apiRouter.get('/themes', async (req, res) => {
+router.get("/themes", async (req, res) => {
   try {
     const allThemes = await themes.getAllThemes();
     res.json(allThemes);
@@ -27,7 +25,7 @@ apiRouter.get('/themes', async (req, res) => {
   }
 });
 
-apiRouter.get('/themes/examples', async (req, res) => {
+router.get("/themes/examples", async (req, res) => {
   try {
     const exampleThemes = await themes.getExampleThemes();
     res.json(exampleThemes);
@@ -36,7 +34,7 @@ apiRouter.get('/themes/examples', async (req, res) => {
   }
 });
 
-apiRouter.get('/themes/:id', async (req, res) => {
+router.get("/themes/:id", async (req, res) => {
   try {
     const theme = await themes.getThemeById(req.params.id);
     res.json(theme);
@@ -46,7 +44,7 @@ apiRouter.get('/themes/:id', async (req, res) => {
 });
 
 // Portfolio routes
-apiRouter.get('/portfolios/examples', async (req, res) => {
+router.get("/portfolios/examples", async (req, res) => {
   try {
     const examplePortfolios = await portfolios.getExamplePortfolios();
     res.json(examplePortfolios);
@@ -55,16 +53,18 @@ apiRouter.get('/portfolios/examples', async (req, res) => {
   }
 });
 
-apiRouter.get('/portfolios/user/:userId', async (req, res) => {
+router.get("/portfolios/user/:userId", async (req, res) => {
   try {
-    const userPortfolios = await portfolios.getPortfoliosByUserId(req.params.userId);
+    const userPortfolios = await portfolios.getPortfoliosByUserId(
+      req.params.userId
+    );
     res.json(userPortfolios);
   } catch (e) {
     res.status(500).json({ error: e });
   }
 });
 
-apiRouter.get('/portfolios/:id', async (req, res) => {
+router.get("/portfolios/:id", async (req, res) => {
   try {
     const portfolio = await portfolios.getPortfolioById(req.params.id);
     res.json(portfolio);
@@ -74,16 +74,18 @@ apiRouter.get('/portfolios/:id', async (req, res) => {
 });
 
 // Message routes
-apiRouter.get('/messages/portfolio/:portfolioId', async (req, res) => {
+router.get("/messages/portfolio/:portfolioId", async (req, res) => {
   try {
-    const portfolioMessages = await messages.getMessagesByPortfolioId(req.params.portfolioId);
+    const portfolioMessages = await messages.getMessagesByPortfolioId(
+      req.params.portfolioId
+    );
     res.json(portfolioMessages);
   } catch (e) {
     res.status(500).json({ error: e });
   }
 });
 
-apiRouter.get('/messages/user/:userId', async (req, res) => {
+router.get("/messages/user/:userId", async (req, res) => {
   try {
     const userMessages = await messages.getMessagesByUserId(req.params.userId);
     res.json(userMessages);
@@ -94,13 +96,12 @@ apiRouter.get('/messages/user/:userId', async (req, res) => {
 
 // Configure routes
 const constructorMethod = (app) => {
-  app.use('/', pagesRouter);
-  app.use('/users', usersRouter);
-  app.use('/api', apiRouter);
-  app.use('/private', privateRoutes);
+  app.use("/", pagesRouter);
+  app.use("/contact-form", contactFormRoute);
 
+  app.use("/api", router);
   app.use((req, res) => {
-    res.status(404).json({ error: 'Not found' });
+    res.status(404).json({ error: "Not found" });
   });
 };
 
