@@ -1,5 +1,6 @@
 import express from 'express';
 import { users, messages, themes, portfolios } from '../data/index.js';
+import pagesRouter from './pages.js';
 
 const router = express.Router();
 
@@ -90,9 +91,11 @@ router.get('/messages/user/:userId', async (req, res) => {
 
 // Configure routes
 const constructorMethod = (app) => {
+  app.use('/', pagesRouter);
+
   app.use('/api', router);
 
-  app.use('*', (req, res) => {
+  app.use((req, res) => {
     res.status(404).json({ error: 'Not found' });
   });
 };
