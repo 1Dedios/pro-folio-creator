@@ -19,8 +19,9 @@
   },
   "homepage": "https://github.com/1Dedios/pro-folio-creator#readme",
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "express": "^5.1.0",
-    "mongodb": "^7.0.0",
-    "bcrypt": "^5.1.1"
+    "express-handlebars": "^8.0.3",
+    "mongodb": "^7.0.0"
   }
 }
