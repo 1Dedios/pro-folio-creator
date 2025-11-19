@@ -7,7 +7,7 @@ router.get('/', async (req, res) => {
   //what should we load here, if anything?  List all users??
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/id/:id', async (req, res) => {
   try {
     const user = await users.getUserById(req.params.id);
     res.json(user);
@@ -37,13 +37,15 @@ router.post('/signup', async (req, res) => {
     const newUserName = newUserData.username;
     const newEmail = newUserData.email;
     const newPassword = newUserData.password;
-    console.log(newUserName);
-    console.log(newPassword);
-    const newUser = createUser(newUserName, newEmail, newPassword);
-    res.render()
+    const newUser = await users.createUser(newUserName, newEmail, newPassword);
+    //to-do: handle what to do after user is created, right now just showing the json user data
+    // maybe back to login page or directly to their default portfolio '/portfolios/user/:userId'
+    res.json(newUser);  
   }
   catch (e) {
     console.log("error post users/signup");
+    //to-do: have a better way to handle error when creating user: probably take them back to signup page
+    //to-do: also need to add client-side form validation
     res.status(500).json({error: e});
   }
 });
@@ -65,6 +67,7 @@ router.post('/login', async (req, res) => {
 
 
   //where should we take the user after they're logged in??
+  // probably their portfolio page '/portfolios/user/:userId'
 });
 
 export default router;
