@@ -1,18 +1,20 @@
 import express from 'express';
 import { users, messages, themes, portfolios } from '../data/index.js';
 import pagesRouter from './pages.js';
+import usersRouter from './users.js';
 
 const router = express.Router();
 
 // User routes
-router.get('/users/:id', async (req, res) => {
+// moved to routes/users.js
+/*router.get('/users/:id', async (req, res) => {
   try {
     const user = await users.getUserById(req.params.id);
     res.json(user);
   } catch (e) {
     res.status(404).json({ error: e });
   }
-});
+});*/
 
 // Theme routes
 router.get('/themes', async (req, res) => {
@@ -92,7 +94,7 @@ router.get('/messages/user/:userId', async (req, res) => {
 // Configure routes
 const constructorMethod = (app) => {
   app.use('/', pagesRouter);
-
+  app.use('/users', usersRouter);
   app.use('/api', router);
 
   app.use((req, res) => {
