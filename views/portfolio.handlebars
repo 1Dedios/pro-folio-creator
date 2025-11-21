@@ -1,0 +1,164 @@
+<div class="portfolio-container">
+    <div class="portfolio-header">
+        <h1>{{portfolio.title}}</h1>
+        <p class="portfolio-description">{{portfolio.description}}</p>
+    </div>
+
+    {{#each portfolio.sections}}
+        <section class="portfolio-section">
+            {{#if (eq this.type "education")}}
+                <h2>Education</h2>
+                <div class="section-items">
+                    {{#each this.items}}
+                        <div class="education-item">
+                            <h3>{{this.institution}}</h3>
+                            <h4>{{this.degree}}</h4>
+                            <p class="date-range">
+                                {{formatDate this.startDate}} - 
+                                {{#if this.endDate}}
+                                    {{formatDate this.endDate}}
+                                {{else}}
+                                    Present
+                                {{/if}}
+                            </p>
+                            {{#if this.location}}
+                                <p class="location">{{this.location}}</p>
+                            {{/if}}
+                            {{#if this.description}}
+                                <p class="description">{{this.description}}</p>
+                            {{/if}}
+                        </div>
+                    {{/each}}
+                </div>
+            {{/if}}
+
+            {{#if (eq this.type "work")}}
+                <h2>Work Experience</h2>
+                <div class="section-items">
+                    {{#each this.items}}
+                        <div class="work-item">
+                            <h3>{{this.company}}</h3>
+                            <h4>{{this.role}}</h4>
+                            <p class="date-range">
+                                {{formatDate this.startDate}} - 
+                                {{#if this.endDate}}
+                                    {{formatDate this.endDate}}
+                                {{else}}
+                                    Present
+                                {{/if}}
+                            </p>
+                            {{#if this.location}}
+                                <p class="location">{{this.location}}</p>
+                            {{/if}}
+                            {{#if this.description}}
+                                <p class="description">{{this.description}}</p>
+                            {{/if}}
+                            {{#if this.achievements}}
+                                <div class="achievements">
+                                    <h5>Achievements:</h5>
+                                    <ul>
+                                        {{#each this.achievements}}
+                                            <li>{{this}}</li>
+                                        {{/each}}
+                                    </ul>
+                                </div>
+                            {{/if}}
+                        </div>
+                    {{/each}}
+                </div>
+            {{/if}}
+
+            {{#if (eq this.type "certification")}}
+                <h2>Certifications</h2>
+                <div class="section-items">
+                    {{#each this.items}}
+                        <div class="certification-item">
+                            <h3>{{this.title}}</h3>
+                            <h4>{{this.issuer}}</h4>
+                            <p class="date-range">
+                                Issued: {{formatDate this.issueDate}}
+                                {{#if this.expirationDate}}
+                                    <br>Expires: {{formatDate this.expirationDate}}
+                                {{/if}}
+                            </p>
+                            {{#if this.description}}
+                                <p class="description">{{this.description}}</p>
+                            {{/if}}
+                        </div>
+                    {{/each}}
+                </div>
+            {{/if}}
+
+            {{#if (eq this.type "project")}}
+                <h2>Projects</h2>
+                <div class="section-items">
+                    {{#each this.items}}
+                        <div class="project-item">
+                            <h3>{{this.title}}</h3>
+                            {{#if this.description}}
+                                <p class="description">{{this.description}}</p>
+                            {{/if}}
+                            {{#if this.technologies}}
+                                <div class="technologies">
+                                    <h5>Technologies:</h5>
+                                    <ul class="tech-list">
+                                        {{#each this.technologies}}
+                                            <li>{{this}}</li>
+                                        {{/each}}
+                                    </ul>
+                                </div>
+                            {{/if}}
+                            {{#if this.startDate}}
+                                <p class="date-range">
+                                    {{formatDate this.startDate}} - 
+                                    {{#if this.endDate}}
+                                        {{formatDate this.endDate}}
+                                    {{else}}
+                                        Present
+                                    {{/if}}
+                                </p>
+                            {{/if}}
+                            {{#if this.githubRepo}}
+                                <p class="github-link">
+                                    <a href="{{this.githubRepo}}" target="_blank">GitHub Repository</a>
+                                </p>
+                            {{/if}}
+                        </div>
+                    {{/each}}
+                </div>
+            {{/if}}
+
+            {{#if (eq this.type "custom")}}
+                {{#each this.items}}
+                    <div class="custom-section">
+                        <h2>{{this.title}}</h2>
+                        <div class="custom-content">
+                            {{{this.content}}}
+                        </div>
+                    </div>
+                {{/each}}
+            {{/if}}
+        </section>
+    {{/each}}
+
+    {{#if portfolio.contactButtonEnabled}}
+        <div class="contact-section">
+            <h2>Contact Me</h2>
+            <form id="contact-form" action="/contact/{{portfolio._id}}" method="POST">
+                <div class="form-group">
+                    <label for="senderName">Your Name</label>
+                    <input type="text" id="senderName" name="senderName" required>
+                </div>
+                <div class="form-group">
+                    <label for="senderEmail">Your Email</label>
+                    <input type="email" id="senderEmail" name="senderEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="message">Message</label>
+                    <textarea id="message" name="message" rows="5" required></textarea>
+                </div>
+                <button type="submit" class="btn-primary">Send Message</button>
+            </form>
+        </div>
+    {{/if}}
+</div>
