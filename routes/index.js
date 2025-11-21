@@ -1,7 +1,7 @@
 import express from 'express';
 import {messages, portfolios, themes, users} from '../data/index.js';
+import pagesRouter from './pages.js';
 
-const router = express.Router();
 const apiRouter = express.Router();
 
 // User routes
@@ -42,7 +42,7 @@ apiRouter.get('/themes/:id', async (req, res) => {
   }
 });
 
-// API Portfolio routes
+// Portfolio routes
 apiRouter.get('/portfolios/examples', async (req, res) => {
   try {
     const examplePortfolios = await portfolios.getExamplePortfolios();
@@ -92,7 +92,7 @@ apiRouter.get('/messages/user/:userId', async (req, res) => {
 // Web routes for rendering templates
 
 // View portfolio by ID
-router.get('/portfolio/:id', async (req, res) => {
+pagesRouter.get('/portfolio/:id', async (req, res) => {
   try {
     const portfolio = await portfolios.getPortfolioById(req.params.id);
 
@@ -105,9 +105,9 @@ router.get('/portfolio/:id', async (req, res) => {
       portfolio: portfolio
     });
   } catch (e) {
-    res.status(404).render('error', { 
-      title: 'Error', 
-      error: 'Portfolio not found' 
+    res.status(404).render('error', {
+      title: 'Error',
+      error: 'Portfolio not found'
     });
   }
 });
@@ -115,13 +115,14 @@ router.get('/portfolio/:id', async (req, res) => {
 // Configure routes
 const constructorMethod = (app) => {
   app.use('/api', apiRouter);
-  app.use('/', router);
+  app.use('/', pagesRouter);
 
   app.use((req, res) => {
-    res.status(404).render('error', { 
-      title: 'Error', 
-      error: 'Page not found' 
+    res.status(404).render('error', {
+      title: 'Error',
+      error: 'Page not found'
     });
+    res.status(404).json({ error: 'Not found' });
   });
 };
 
