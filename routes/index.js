@@ -1,6 +1,6 @@
 import express from 'express';
 import {messages, portfolios, themes, users} from '../data/index.js';
-import pagesRouter from './pages.js';
+import router from './pages.js';
 
 const apiRouter = express.Router();
 
@@ -89,33 +89,10 @@ apiRouter.get('/messages/user/:userId', async (req, res) => {
   }
 });
 
-// Web routes for rendering templates
-
-// View portfolio by ID
-pagesRouter.get('/portfolio/:id', async (req, res) => {
-  try {
-    const portfolio = await portfolios.getPortfolioById(req.params.id);
-
-    // Get the theme for the portfolio
-    // Note: We're ignoring themes for now as specified in the requirements
-    // const theme = await themes.getThemeById(portfolio.themeId);
-
-    res.render('portfolio', {
-      title: portfolio.title,
-      portfolio: portfolio
-    });
-  } catch (e) {
-    res.status(404).render('error', {
-      title: 'Error',
-      error: 'Portfolio not found'
-    });
-  }
-});
-
 // Configure routes
 const constructorMethod = (app) => {
   app.use('/api', apiRouter);
-  app.use('/', pagesRouter);
+  app.use('/', router);
 
   app.use((req, res) => {
     res.status(404).render('error', {
