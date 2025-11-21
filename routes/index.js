@@ -1,10 +1,11 @@
 import express from 'express';
-import { users, messages, themes, portfolios } from '../data/index.js';
+import {messages, portfolios, themes, users} from '../data/index.js';
 
 const router = express.Router();
+const apiRouter = express.Router();
 
 // User routes
-router.get('/users/:id', async (req, res) => {
+apiRouter.get('/users/:id', async (req, res) => {
   try {
     const user = await users.getUserById(req.params.id);
     res.json(user);
@@ -14,7 +15,7 @@ router.get('/users/:id', async (req, res) => {
 });
 
 // Theme routes
-router.get('/themes', async (req, res) => {
+apiRouter.get('/themes', async (req, res) => {
   try {
     const allThemes = await themes.getAllThemes();
     res.json(allThemes);
@@ -23,7 +24,7 @@ router.get('/themes', async (req, res) => {
   }
 });
 
-router.get('/themes/examples', async (req, res) => {
+apiRouter.get('/themes/examples', async (req, res) => {
   try {
     const exampleThemes = await themes.getExampleThemes();
     res.json(exampleThemes);
@@ -32,7 +33,7 @@ router.get('/themes/examples', async (req, res) => {
   }
 });
 
-router.get('/themes/:id', async (req, res) => {
+apiRouter.get('/themes/:id', async (req, res) => {
   try {
     const theme = await themes.getThemeById(req.params.id);
     res.json(theme);
@@ -41,8 +42,8 @@ router.get('/themes/:id', async (req, res) => {
   }
 });
 
-// Portfolio routes
-router.get('/portfolios/examples', async (req, res) => {
+// API Portfolio routes
+apiRouter.get('/portfolios/examples', async (req, res) => {
   try {
     const examplePortfolios = await portfolios.getExamplePortfolios();
     res.json(examplePortfolios);
@@ -51,7 +52,7 @@ router.get('/portfolios/examples', async (req, res) => {
   }
 });
 
-router.get('/portfolios/user/:userId', async (req, res) => {
+apiRouter.get('/portfolios/user/:userId', async (req, res) => {
   try {
     const userPortfolios = await portfolios.getPortfoliosByUserId(req.params.userId);
     res.json(userPortfolios);
@@ -60,7 +61,7 @@ router.get('/portfolios/user/:userId', async (req, res) => {
   }
 });
 
-router.get('/portfolios/:id', async (req, res) => {
+apiRouter.get('/portfolios/:id', async (req, res) => {
   try {
     const portfolio = await portfolios.getPortfolioById(req.params.id);
     res.json(portfolio);
@@ -70,7 +71,7 @@ router.get('/portfolios/:id', async (req, res) => {
 });
 
 // Message routes
-router.get('/messages/portfolio/:portfolioId', async (req, res) => {
+apiRouter.get('/messages/portfolio/:portfolioId', async (req, res) => {
   try {
     const portfolioMessages = await messages.getMessagesByPortfolioId(req.params.portfolioId);
     res.json(portfolioMessages);
@@ -79,7 +80,7 @@ router.get('/messages/portfolio/:portfolioId', async (req, res) => {
   }
 });
 
-router.get('/messages/user/:userId', async (req, res) => {
+apiRouter.get('/messages/user/:userId', async (req, res) => {
   try {
     const userMessages = await messages.getMessagesByUserId(req.params.userId);
     res.json(userMessages);
@@ -88,12 +89,39 @@ router.get('/messages/user/:userId', async (req, res) => {
   }
 });
 
+// Web routes for rendering templates
+
+// View portfolio by ID
+router.get('/portfolio/:id', async (req, res) => {
+  try {
+    const portfolio = await portfolios.getPortfolioById(req.params.id);
+
+    // Get the theme for the portfolio
+    // Note: We're ignoring themes for now as specified in the requirements
+    // const theme = await themes.getThemeById(portfolio.themeId);
+
+    res.render('portfolio', {
+      title: portfolio.title,
+      portfolio: portfolio
+    });
+  } catch (e) {
+    res.status(404).render('error', { 
+      title: 'Error', 
+      error: 'Portfolio not found' 
+    });
+  }
+});
+
 // Configure routes
 const constructorMethod = (app) => {
-  app.use('/api', router);
+  app.use('/api', apiRouter);
+  app.use('/', router);
 
-  app.use('*', (req, res) => {
-    res.status(404).json({ error: 'Not found' });
+  app.use((req, res) => {
+    res.status(404).render('error', { 
+      title: 'Error', 
+      error: 'Page not found' 
+    });
   });
 };
 
