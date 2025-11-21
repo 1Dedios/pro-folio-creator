@@ -1,18 +1,20 @@
 import express from 'express';
 import {messages, portfolios, themes, users} from '../data/index.js';
-import router from './pages.js';
+import pagesRouter from './pages.js';
+import usersRouter from './users.js';
 
 const apiRouter = express.Router();
 
 // User routes
-apiRouter.get('/users/:id', async (req, res) => {
+// moved to routes/users.js
+/*router.get('/users/:id', async (req, res) => {
   try {
     const user = await users.getUserById(req.params.id);
     res.json(user);
   } catch (e) {
     res.status(404).json({ error: e });
   }
-});
+});*/
 
 // Theme routes
 apiRouter.get('/themes', async (req, res) => {
@@ -91,14 +93,11 @@ apiRouter.get('/messages/user/:userId', async (req, res) => {
 
 // Configure routes
 const constructorMethod = (app) => {
+  app.use('/', pagesRouter);
+  app.use('/users', usersRouter);
   app.use('/api', apiRouter);
-  app.use('/', router);
 
   app.use((req, res) => {
-    res.status(404).render('error', {
-      title: 'Error',
-      error: 'Page not found'
-    });
     res.status(404).json({ error: 'Not found' });
   });
 };
