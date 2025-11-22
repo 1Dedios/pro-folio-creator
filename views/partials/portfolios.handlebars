@@ -1,0 +1,35 @@
+<section class="portfolios">
+    <h2>Your portfolios</h2>
+
+    {{#if portfolios.length}}
+    <div class="grid">
+        {{#each portfolios}}
+        <article class="card">
+            <header>
+                <h3>{{this.title}}</h3>
+                {{#ifEquals this._id ../user.activePortfolioId}}
+                <span class="badge active">Active</span>
+                {{/ifEquals}}
+            </header>
+            <p class="desc">{{this.description}}</p>
+            <p class="meta">Sections: {{this.sections.length}} • Last edited: {{formatDate this.updatedAt}}</p>
+
+            <div class="card-actions">
+                <a class="btn" href="/portfolios/{{this._id}}">Preview</a>
+
+                <form method="post" action="/portfolios/{{this._id}}/activate" style="display:inline">
+                    <button class="btn primary" type="submit">Set active</button>
+                </form>
+
+                <form method="post" action="/portfolios/{{this._id}}/delete" style="display:inline"
+                    onsubmit="return confirm('Delete this portfolio?')">
+                    <button class="btn" type="submit">Delete</button>
+                </form>
+            </div>
+        </article>
+        {{/each}}
+    </div>
+    {{else}}
+    <div class="empty">You don't have any portfolios yet. <a href="/create">Create one</a>.</div>
+    {{/if}}
+</section>

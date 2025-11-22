@@ -1,0 +1,21 @@
+{
+  "name": "portfolio",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "seed": "node seed/seed.js"
+  },
+  "engines": {
+    "node": "22.21.1"
+  },
+  "dependencies": {
+    "bcrypt": "5.1.0",
+    "dotenv": "^16.6.1",
+    "express": "^4.18.2",
+    "express-handlebars": "^6.0.7",
+    "mongoose": "^7.8.7"
+  }
+}

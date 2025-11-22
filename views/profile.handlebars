@@ -1,0 +1,20 @@
+<main class="container">
+    {{#if error}}
+    <div class="empty" style="border-color:#f8d7da;background:#fff6f7;color:#7a1111;">
+        {{error}}
+    </div>
+    {{/if}}
+
+    <section class="profile-header">
+        {{#if user}}
+        <h1>{{user.username}}</h1>
+        <div class="muted">Member since: {{formatDate user.createdAt}}</div>
+        {{else}}
+        <h1>Guest</h1>
+        <div class="muted">Please sign in to manage your portfolios.</div>
+        {{/if}}
+    </section>
+
+    {{!-- include portfolios partial (no duplicated topbar inside partial) --}}
+    {{> portfolios portfolios=portfolios user=user}}
+</main>

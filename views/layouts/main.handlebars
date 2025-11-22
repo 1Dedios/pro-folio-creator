@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>{{title}}</title>
+    <link rel="stylesheet" href="/public/css/styles.css">
+    <script defer src="/public/js/ui.js"></script>
+</head>
+
+<body>
+    <!-- Topbar: left nav + right avatar -->
+    <header class="topbar">
+        <div class="topbar-inner">
+            <!-- left (nav) -->
+            <div class="top-left" role="navigation" aria-label="Main navigation">
+                <a class="nav-item" href="/">Home</a>
+                <a class="nav-item" href="/create">Create</a>
+                <a class="nav-item" href="/profile">Profile</a>
+            </div>
+
+            <!-- right (avatar) -->
+            <div class="top-right" aria-live="polite">
+                <div class="avatar-wrap">
+                    <!-- avatar button -->
+                    <img id="avatarBtn" src="/public/img/default-avatar.svg" class="avatar" alt="User avatar"
+                        tabindex="0" aria-haspopup="true" aria-expanded="false" />
+
+                    <!-- dropdown (hidden by default; toggled by JS) -->
+                    <div id="avatarDropdown" class="dropdown" aria-hidden="true" role="menu">
+                        {{#if user}}
+                        <div class="dropdown-name">{{user.username}}</div>
+                        <div class="dropdown-email">{{user.email}}</div>
+                        <hr />
+                        <a class="btn" href="/profile/{{user._id}}">View profile</a>
+                        <a class="btn ghost" href="/logout">Sign out</a>
+                        {{else}}
+                        <div class="dropdown-name">Not signed in</div>
+                        <div class="dropdown-email muted">Click to sign in or sign up</div>
+                        <hr />
+                        <a class="btn primary" href="/login">Sign in</a>
+                        <a class="btn ghost" href="/signup">Sign up</a>
+                        {{/if}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main page content will be rendered here -->
+    <main class="container">
+        {{{body}}}
+    </main>
+
+</body>
+
+</html>
