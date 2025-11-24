@@ -1,7 +1,8 @@
 import express from 'express';
-import {engine} from 'express-handlebars';
-import {fileURLToPath} from 'url';
-import {dirname, join} from 'path';
+import { engine } from 'express-handlebars';
+import session from 'express-session';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 import configRoutes from './routes/index.js';
 import * as handlebarsHelpers from './views/helpers.js';
 
@@ -26,6 +27,36 @@ app.set('views', join(__dirname, 'views'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/public', express.static(join(__dirname, 'public')));
+app.use(
+  session({
+    name: 'ProFolio',
+    secret: 'ProFolioGlobalSessionSecret',
+    saveUninitialized: false,
+    resave: false,
+    cookie: { maxAge: 60000 } // maxAge in msec, so this is just 60 seconds, probably should extend that
+  })
+)
+
+app.use('/private', (req, res, next) => {
+  //console.log(`session.id: ${req.session.id}`)
+  if (!req.session.user) {  // no logged in user (no session.user info)
+    return res.redirect('/'); // redirect to home page
+  }
+  else {
+    next();
+  }
+});
+
+app.use('/users/login', (req, res, next) => {
+  if (req.session.user) {   // user already logged in
+    return res.redirect('/private');
+  }
+  else {
+    //req.method = 'POST';  // not needed since it will be a POST coming from the form
+    console.log('middleware /users/login')
+    next();
+  }
+});
 
 // Configure routes
 configRoutes(app);

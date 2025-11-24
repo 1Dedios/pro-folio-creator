@@ -1,22 +1,15 @@
 import express from 'express';
 import { users } from '../data/index.js';
-
+import bcrypt from 'bcrypt';
 const router = express.Router();
+
+const saltRounds = 10;
 
 router.get('/', async (req, res) => {
   //what should we load here, if anything?  List all users??
 });
 
-router.get('/id/:id', async (req, res) => {
-  try {
-    const user = await users.getUserById(req.params.id);
-    res.json(user);
-  } catch (e) {
-    res.status(404).json({ error: e });
-  }
-});
-
-//get users/signup page with form
+//get users/signup page with form to fill out
 router.get('/signup', async (req, res) => {
   try {
     console.log("render get users/signup");
@@ -58,16 +51,52 @@ router.get('/login', async (req, res) => {
   }
   catch (e) {
     console.log("error rendering users/login");
-    res.status(500).json({ error: e});
+    res.status(500).json({ error: e});  // to-do: better error message
   }
 });
 
-//post users/login to log in 
+//post users/login to log in user & create session.user info
 router.post('/login', async (req, res) => {
+  console.log("post users/login");
+  const { username, password } = req.body;
+  let user = {};
+  try {
+    user = await users.getUserByUsername(username);
+    console.log(`user found with id: ${user._id}`)
+    console.log(user);
+  }
+  catch (e) {
+    console.log("no username found in /users/login");
+    return res.status(500).json({ error: e});  // to-do: better error message
+  }
+  console.log(user.username);
+  let match = {};
+  try {
+    match = await users.checkUser(username, password);  //checkUser throws error if passwords don't match
+    req.session.user = {
+      firstName: user.firstName, 
+      lastName: user.lastName,
+      userId: user.id
+    }
+    res.redirect('/private');
+  // where should we redirect the user after they're logged in??
+  // probably their portfolio page '/portfolios/user/:userId' but that doesn't exist yet
+  // '/private' is just what I did for a start since it's what the lecture used
+  }
+  catch (e) {   // checkUser failed
+    console.log(`error from checkUser ${e}`);
+    return res.status(500).json({error: e});
+  }
+});
 
-
-  //where should we take the user after they're logged in??
-  // probably their portfolio page '/portfolios/user/:userId'
+router.get('/:id', async (req, res) => {
+  try {
+    const user = await users.getUserById(req.params.id);
+    // to-do: change this to list user info & show their picture
+    res.json(user); 
+  } catch (e) {
+    res.status(404).json({ error: e });
+  }
 });
 
 export default router;
