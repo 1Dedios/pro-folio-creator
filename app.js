@@ -50,6 +50,7 @@ app.use('/private', (req, res, next) => {
 app.use('/users/login', (req, res, next) => {
   if (req.session.user) {   // user already logged in
     return res.redirect('/private');
+    // once users profile page exists we should change this to user's profile 'portfolio/users/_id'
   }
   else {
     //req.method = 'POST';  // not needed since it will be a POST coming from the form

@@ -85,8 +85,13 @@ router.post('/login', async (req, res) => {
   }
   catch (e) {   // checkUser failed
     console.log(`error from checkUser ${e}`);
-    return res.status(500).json({error: e});
+    return res.status(500).json({error: e});  // probably change this to 401 or 403 for unauathorized user
   }
+});
+
+router.get('/logout', async (req, res) => { // need to add /users/logout link for template of any page where a user is logged in
+  req.session.destroy();
+  res.send('Logged out');
 });
 
 router.get('/:id', async (req, res) => {
