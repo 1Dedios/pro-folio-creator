@@ -62,8 +62,9 @@ export const validateArray = (arr, paramName, validateFn) => {
 
 // Email validation
 export const validateEmail = (email, paramName) => {
+  if (email.length > 254) throw new Error('Input for Email is too long');
   email = validateString(email, paramName || 'Email');
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
   if (!emailRegex.test(email)) throw `${paramName || 'Email'} is not a valid email address`;
   return email;
 };
