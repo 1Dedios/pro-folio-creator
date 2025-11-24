@@ -1,16 +1,33 @@
 import express from 'express';
+import {engine} from 'express-handlebars';
+import {fileURLToPath} from 'url';
+import {dirname, join} from 'path';
 import configRoutes from './routes/index.js';
-import exphbs from 'express-handlebars';
+import * as handlebarsHelpers from './views/helpers.js';
+
+// Get the directory name of the current module
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const app = express();
-app.use(express.json());
 
-app.use('/public', express.static('public'));
-app.use(express.urlencoded({extended: true}));
-
-app.engine('handlebars', exphbs.engine({defaultLayout: 'main'}));
+// Configure express-handlebars
+app.engine('handlebars', engine({
+  defaultLayout: 'main',
+  helpers: {
+    formatDate: handlebarsHelpers.formatDate,
+    eq: handlebarsHelpers.eq
+  }
+}));
 app.set('view engine', 'handlebars');
+app.set('views', join(__dirname, 'views'));
 
+// Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use('/public', express.static(join(__dirname, 'public')));
+
+// Configure routes
 configRoutes(app);
 
 app.listen(3000, () => {
