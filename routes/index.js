@@ -2,6 +2,7 @@ import express from 'express';
 import {messages, portfolios, themes, users} from '../data/index.js';
 import pagesRouter from './pages.js';
 import usersRouter from './users.js';
+import privateRoutes from './private.js';
 
 const apiRouter = express.Router();
 
@@ -96,6 +97,7 @@ const constructorMethod = (app) => {
   app.use('/', pagesRouter);
   app.use('/users', usersRouter);
   app.use('/api', apiRouter);
+  app.use('/private', privateRoutes);
 
   app.use((req, res) => {
     res.status(404).json({ error: 'Not found' });
