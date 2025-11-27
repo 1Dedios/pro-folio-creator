@@ -4,25 +4,31 @@
     {{#if portfolios.length}}
     <div class="grid">
         {{#each portfolios}}
-        <article class="card">
+        <article class="card" data-portfolio-id="{{this._id}}">
             <header>
                 <h3>{{this.title}}</h3>
                 {{#ifEquals this._id ../user.activePortfolioId}}
                 <span class="badge active">Active</span>
                 {{/ifEquals}}
             </header>
+
             <p class="desc">{{this.description}}</p>
             <p class="meta">Sections: {{this.sections.length}} • Last edited: {{formatDate this.updatedAt}}</p>
 
             <div class="card-actions">
                 <a class="btn" href="/portfolios/{{this._id}}">Preview</a>
 
-                <form method="post" action="/portfolios/{{this._id}}/activate" style="display:inline">
+                <!-- Activate: add class and hidden userId input, point to /api route -->
+                <form method="post" action="/api/portfolios/{{this._id}}/activate" class="activate-form"
+                    style="display:inline">
+                    <input type="hidden" name="userId" value="{{../user._id}}">
                     <button class="btn primary" type="submit">Set active</button>
                 </form>
 
-                <form method="post" action="/portfolios/{{this._id}}/delete" style="display:inline"
-                    onsubmit="return confirm('Delete this portfolio?')">
+                <!-- Delete: add class and hidden userId input, point to /api route -->
+                <form method="post" action="/api/portfolios/{{this._id}}/delete" class="js-delete-form"
+                    data-portfolio-id="{{this._id}}" style="display:inline">
+                    <input type="hidden" name="userId" value="{{../user._id}}">
                     <button class="btn" type="submit">Delete</button>
                 </form>
             </div>

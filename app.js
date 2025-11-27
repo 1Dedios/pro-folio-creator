@@ -1,9 +1,9 @@
 // app.js
 import express from "express";
+import configRoutes from "./routes/index.js";
+import exphbs from "express-handlebars";
 import path from "path";
 import { fileURLToPath } from "url";
-import exphbs from "express-handlebars";
-import configRoutes from "./routes/index.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -43,7 +43,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// wire existing routes
 configRoutes(app);
 
 const PORT = process.env.PORT || 3000;

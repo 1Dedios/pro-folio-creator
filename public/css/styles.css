@@ -302,3 +302,41 @@ body {
   font-size: 13px;
   color: var(--muted);
 }
+
+/* dropdown visibility helpers */
+.dropdown.hidden {
+  display: none;
+}
+.dropdown {
+  display: block;
+  position: absolute;
+  right: 12px;
+  top: 56px;
+  min-width: 200px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  padding: 8px;
+  z-index: 60;
+}
+.dropdown-item {
+  text-decoration: none;
+  display: flex;
+  justify-content: space-between;
+}
+.dropdown.open {
+  display: block;
+}
+.avatar-btn {
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+}
+.avatar {
+  border-radius: 8px;
+  display: block;
+}
+.avatar-wrap {
+  position: relative;
+}

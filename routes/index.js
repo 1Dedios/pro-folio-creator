@@ -94,6 +94,121 @@ router.get("/messages/user/:userId", async (req, res) => {
   }
 });
 
+router.post("/portfolios/:id/delete", async (req, res) => {
+  const portfolioId = req.params.id;
+  const userId = req.body.userId;
+
+  console.log(
+    `DELETE request for portfolioId=${portfolioId} by userId=${userId}`
+  );
+
+  try {
+    const portfolio = await portfolios.getPortfolioById(portfolioId);
+
+    if (String(portfolio.ownerId) !== String(userId)) {
+      console.warn("Delete attempt by non-owner", { portfolioId, userId });
+      if (
+        req.xhr ||
+        req.get("X-Requested-With") === "XMLHttpRequest" ||
+        req.accepts("json")
+      ) {
+        return res.status(403).json({ error: "Forbidden" });
+      }
+      return res
+        .status(403)
+        .render("home", { title: "Profolio", error: "Forbidden" });
+    }
+
+    await portfolios.removePortfolio(portfolioId);
+    console.log("Deleted portfolio", portfolioId);
+
+    if (
+      req.xhr ||
+      req.get("X-Requested-With") === "XMLHttpRequest" ||
+      req.accepts("json")
+    ) {
+      return res.json({ deleted: true, portfolioId });
+    }
+
+    // Non-AJAX fallback: redirect
+    return res.redirect(303, `/profile/${userId}`);
+  } catch (err) {
+    console.error(
+      "Error deleting portfolio:",
+      err && err.stack ? err.stack : err
+    );
+    if (
+      req.xhr ||
+      req.get("X-Requested-With") === "XMLHttpRequest" ||
+      req.accepts("json")
+    ) {
+      return res.status(500).json({ error: "Could not delete portfolio" });
+    }
+    // Non-AJAX fallback
+    return res.redirect(303, `/profile/${userId}`);
+  }
+});
+
+// Activate a portfolio (supports AJAX)
+router.post("/portfolios/:id/activate", async (req, res) => {
+  try {
+    const portfolioId = req.params.id;
+    const userId = req.body.userId; // comes from the hidden input in the form
+
+    // verify portfolio exists
+    const portfolio = await portfolios.getPortfolioById(portfolioId);
+
+    // ensure the current profile owner is the portfolio owner
+    if (String(portfolio.ownerId) !== String(userId)) {
+      console.warn("Activate attempt by non-owner", { portfolioId, userId });
+      if (
+        req.xhr ||
+        req.get("X-Requested-With") === "XMLHttpRequest" ||
+        req.accepts("json")
+      ) {
+        return res.status(403).json({ error: "Forbidden" });
+      }
+      return res
+        .status(403)
+        .render("home", { title: "Profolio", error: "Forbidden" });
+    }
+
+    // set active portfolio for the user
+    await users.updateActivePortfolio(userId, portfolioId);
+
+    if (
+      req.xhr ||
+      req.get("X-Requested-With") === "XMLHttpRequest" ||
+      req.accepts("json")
+    ) {
+      return res.json({
+        success: true,
+        userId,
+        activePortfolioId: portfolioId,
+      });
+    }
+
+    // redirect back to the profile page for non-AJAX
+    return res.redirect(`/profile/${userId}`);
+  } catch (err) {
+    console.error(
+      "Error activating portfolio:",
+      err && err.stack ? err.stack : err
+    );
+    if (
+      req.xhr ||
+      req.get("X-Requested-With") === "XMLHttpRequest" ||
+      req.accepts("json")
+    ) {
+      return res.status(500).json({ error: "Could not activate portfolio" });
+    }
+    return res.status(500).render("home", {
+      title: "Profolio",
+      error: "Could not activate portfolio",
+    });
+  }
+});
+
 // Configure routes
 const constructorMethod = (app) => {
   app.use("/", pagesRouter);

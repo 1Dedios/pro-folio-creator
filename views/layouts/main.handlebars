@@ -2,44 +2,41 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>{{title}}</title>
     <link rel="stylesheet" href="/public/css/styles.css">
-    <script defer src="/public/js/ui.js"></script>
 </head>
 
 <body>
-    <!-- Topbar: left nav + right avatar -->
     <header class="topbar">
         <div class="topbar-inner">
-            <!-- left (nav) -->
-            <div class="top-left" role="navigation" aria-label="Main navigation">
+            <div class="top-left">
                 <a class="nav-item" href="/">Home</a>
                 <a class="nav-item" href="/create">Create</a>
-                <a class="nav-item" href="/profile">Profile</a>
+                {{#if user}}
+                <a class="nav-item" href="/profile/{{user._id}}">Profile</a>
+                {{else}}
+                <a class="nav-item" href="/login">Profile</a>
+                {{/if}}
             </div>
-
-            <!-- right (avatar) -->
-            <div class="top-right" aria-live="polite">
+    
+            <div class="top-right">
                 <div class="avatar-wrap">
-                    <!-- avatar button -->
-                    <img id="avatarBtn" src="/public/img/default-avatar.svg" class="avatar" alt="User avatar"
-                        tabindex="0" aria-haspopup="true" aria-expanded="false" />
-
-                    <!-- dropdown (hidden by default; toggled by JS) -->
-                    <div id="avatarDropdown" class="dropdown" aria-hidden="true" role="menu">
+                    <button id="avatarBtn" class="avatar-btn" aria-label="Open user menu" type="button">
+                        <img class="avatar" src="/public/img/default-avatar.svg" alt="avatar" width="40" height="40">
+                    </button>
+    
+                    <div id="avatarDropdown" class="dropdown hidden" aria-hidden="true" role="menu">
                         {{#if user}}
                         <div class="dropdown-name">{{user.username}}</div>
                         <div class="dropdown-email">{{user.email}}</div>
                         <hr />
-                        <a class="btn" href="/profile/{{user._id}}">View profile</a>
-                        <a class="btn ghost" href="/logout">Sign out</a>
+                        <a class="dropdown-item" href="/profile/{{user._id}}">View profile</a>
+                        <a class="dropdown-item" href="/logout">Log out</a>
                         {{else}}
-                        <div class="dropdown-name">Not signed in</div>
-                        <div class="dropdown-email muted">Click to sign in or sign up</div>
-                        <hr />
-                        <a class="btn primary" href="/login">Sign in</a>
-                        <a class="btn ghost" href="/signup">Sign up</a>
+                        <a class="dropdown-item" href="/signup">Sign up</a>
+                        <a class="dropdown-item" href="/login">Log in</a>
                         {{/if}}
                     </div>
                 </div>
@@ -47,11 +44,17 @@
         </div>
     </header>
 
-    <!-- Main page content will be rendered here -->
+
     <main class="container">
         {{{body}}}
     </main>
 
+    <footer class="site-footer">
+        © <span id="year">{{year}}</span> ProFolio
+    </footer>
+
+    <script src="/public/js/ui.js" defer></script>
+    <script src="/public/js/profile.js"></script>
 </body>
 
 </html>
