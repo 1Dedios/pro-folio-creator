@@ -1,31 +1,51 @@
-import express from 'express';
-import {portfolios} from "../data/index.js";
+// routes/pages.js
+import express from "express";
+import { users, portfolios } from "../data/index.js";
 
 const router = express.Router();
 
-router.get('/', (req, res) => {
-    res.render('home', { title: 'ProFolio'});
-});
-
-router.get('/create', (req, res) => {                          
-    res.render('create', { title: 'Create Your Own Portfolio'});
-});
-
-router.get('/portfolio/:id', async (req, res) => {
+router.get("/", async (req, res) => {
+  try {
+    let demoUser = null;
     try {
-        const portfolio = await portfolios.getPortfolioById(req.params.id);
-
-        // Get the theme for the portfolio
-        // Note: We're ignoring themes for now as specified in the requirements
-        // const theme = await themes.getThemeById(portfolio.themeId);
-
-        res.render('portfolio', {
-            title: portfolio.title,
-            portfolio: portfolio
-        });
+      demoUser = await users.getUserByUsername("kartik");
     } catch (e) {
-        res.status(404).json({ error: 'Not found' });
+      demoUser = null;
     }
+
+    return res.render("home", {
+      title: "Profolio",
+      user: demoUser || null,
+    });
+  } catch (err) {
+    console.error("Error rendering home:", err);
+    return res.render("home", { title: "Profolio", user: null });
+  }
+});
+
+router.get("/create", (req, res) => {
+  res.render("create", { title: "Create Your Own Portfolio" });
+});
+
+router.get("/profile/:userId", async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const userObj = await users.getUserById(userId);
+    const userPortfolios = await portfolios.getPortfoliosByUserId(userId);
+    res.render("profile", {
+      title: `${userObj.username}'s profile`,
+      user: userObj,
+      portfolios: userPortfolios,
+      year: new Date().getFullYear(),
+    });
+  } catch (err) {
+    console.error("Error fetching profile for userId=", req.params.userId, err);
+    return res.status(404).render("home", {
+      title: "Profolio",
+      error: "User not found",
+      user: null,
+    });
+  }
 });
 
 export default router;

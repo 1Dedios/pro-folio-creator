@@ -2,28 +2,59 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>{{title}}</title>
     <link rel="stylesheet" href="/public/css/styles.css">
 </head>
 
 <body>
-    <header>
-        <nav>
-            <ul>
-                <li><a href="/">Home</a></li>
-            </ul>
-        </nav>
+    <header class="topbar">
+        <div class="topbar-inner">
+            <div class="top-left">
+                <a class="nav-item" href="/">Home</a>
+                <a class="nav-item" href="/create">Create</a>
+                {{#if user}}
+                <a class="nav-item" href="/profile/{{user._id}}">Profile</a>
+                {{else}}
+                <a class="nav-item" href="/login">Profile</a>
+                {{/if}}
+            </div>
+    
+            <div class="top-right">
+                <div class="avatar-wrap">
+                    <button id="avatarBtn" class="avatar-btn" aria-label="Open user menu" type="button">
+                        <img class="avatar" src="/public/img/default-avatar.svg" alt="avatar" width="40" height="40">
+                    </button>
+    
+                    <div id="avatarDropdown" class="dropdown hidden" aria-hidden="true" role="menu">
+                        {{#if user}}
+                        <div class="dropdown-name">{{user.username}}</div>
+                        <div class="dropdown-email">{{user.email}}</div>
+                        <hr />
+                        <a class="dropdown-item" href="/profile/{{user._id}}">View profile</a>
+                        <a class="dropdown-item" href="/logout">Log out</a>
+                        {{else}}
+                        <a class="dropdown-item" href="/signup">Sign up</a>
+                        <a class="dropdown-item" href="/login">Log in</a>
+                        {{/if}}
+                    </div>
+                </div>
+            </div>
+        </div>
     </header>
 
-    <main>
+
+    <main class="container">
         {{{body}}}
     </main>
 
-    <footer>ProFolio</footer>
+    <footer class="site-footer">
+        © <span id="year">{{year}}</span> ProFolio
+    </footer>
 
-
-
+    <script src="/public/js/ui.js" defer></script>
+    <script src="/public/js/profile.js"></script>
 </body>
 
 </html>

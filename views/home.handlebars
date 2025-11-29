@@ -3,8 +3,13 @@
 
 <div class="home-buttons">
     <a href="/create" class="button-create">Create Portfolio!</a>
-    <a href="/users/signup" class="button-signup">Sign Up</a>
-    <a href="/users/login" class="button-login">Log In</a>
+    <a href="/signup" class="button-signup">Sign Up</a>
+    <a href="/login" class="button-login">Log In</a>
+    {{#if demoUserId}}
+    <a href="/profile/{{demoUserId}}" class="button-profile">View Demo Profile</a>
+    {{else}}
+    <a href="#" class="button-profile disabled">View Demo Profile (no user)</a>
+    {{/if}}
     <a href="/portfolios/examples" class="button-examples">View Some Examples</a>
 </div>
 
