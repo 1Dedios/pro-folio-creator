@@ -5,6 +5,7 @@
     <meta charset="utf-8">
     <title>{{title}}</title>
     <link rel="stylesheet" href="/public/css/styles.css">
+    <link rel="stylesheet" href="/public/css/ui-enhancements.css">
 </head>
 
 <body>
@@ -12,6 +13,14 @@
         <nav>
             <ul>
                 <li><a href="/">Home</a></li>
+                <li>
+                    {{#if user}}
+                    <a class="nav-item" href="/profile/{{user._id}}">Profile</a>
+                    {{else}}
+                    <a class="nav-item" href="/users/login">Profile</a>
+                    {{/if}}
+                </li>
+                <li><a class="nav-item" href="/create">Create</a></li>
             </ul>
         </nav>
     </header>
@@ -22,7 +31,11 @@
 
     <footer>ProFolio</footer>
 
-
+<script>
+  window.__APP_USER = {{{userJson}}};
+</script>
+<script type="module" src="/public/js/topbar.js"></script>
+<script src="/public/js/profile.js" defer></script>
 
 </body>
 

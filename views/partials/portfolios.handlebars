@@ -1,0 +1,42 @@
+<section class="portfolios">
+    <h2>Your portfolios</h2>
+
+    {{#if portfolios.length}}
+    <div class="grid">
+        {{#each portfolios}}
+        <article class="card" data-portfolio-id="{{this._id}}">
+            <header>
+                <h3>{{this.title}}</h3>
+                {{#ifEquals this._id ../user.activePortfolioId}}
+                <span class="badge active">Active</span>
+                {{/ifEquals}}
+            </header>
+
+            <p class="desc">{{this.description}}</p>
+            <p class="meta">Sections: {{this.sections.length}} • Last edited: {{formatDate this.updatedAt}}</p>
+
+            <div class="card-actions">
+                <a class="btn" href="/portfolios/{{this._id}}">Preview</a>
+
+                <!-- Note the /api prefix -->
+                <form method="post" action="/api/portfolios/{{this._id}}/activate"
+                    class="activate-form js-activate-form" data-portfolio-id="{{this._id}}" style="display:inline">
+                    <input type="hidden" name="userId" value="{{../user._id}}">
+                    <button class="btn primary" type="submit">{{#ifEquals this._id
+                        ../user.activePortfolioId}}Active{{else}}Set active{{/ifEquals}}</button>
+                </form>
+
+                <form method="post" action="/api/portfolios/{{this._id}}/delete" class="js-delete-form"
+                    data-portfolio-id="{{this._id}}" style="display:inline"
+                    onsubmit="return confirm('Delete this portfolio?')">
+                    <input type="hidden" name="userId" value="{{../user._id}}">
+                    <button class="btn" type="submit">Delete</button>
+                </form>
+            </div>
+        </article>
+        {{/each}}
+    </div>
+    {{else}}
+    <div class="empty">You don't have any portfolios yet. <a href="/create">Create one</a>.</div>
+    {{/if}}
+</section>

@@ -1,0 +1,310 @@
+/* ===============================
+   GLOBAL UI POLISH
+================================ */
+body {
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background: linear-gradient(180deg, #f9fafb, #f1f5f9);
+}
+
+main {
+  min-height: 85vh;
+}
+
+/* ===============================
+   NAVBAR
+================================ */
+nav {
+  background: #111827;
+  padding: 0.8rem 1.5rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+nav a {
+  color: white !important;
+  margin-right: 1.5rem;
+  font-weight: 500;
+  transition: opacity 0.2s ease;
+}
+
+nav a:hover {
+  opacity: 0.8;
+  text-decoration: none;
+}
+
+/* ===============================
+   PAGE CONTAINERS
+================================ */
+.container,
+.portfolio-container {
+  background: white;
+  border-radius: 14px;
+  padding: 2rem;
+  margin-top: 2rem;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+}
+
+/* ===============================
+   PROFILE PAGE
+================================ */
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.profile-avatar {
+  width: 85px;
+  height: 85px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.7rem;
+  font-weight: bold;
+}
+
+.profile-info h2 {
+  margin-bottom: 0.2rem;
+}
+
+.profile-info p {
+  color: var(--dark-gray);
+  font-size: 0.95rem;
+}
+
+/* ===============================
+   PORTFOLIO CARDS
+================================ */
+.portfolio-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--light-gray);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.portfolio-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.12);
+}
+
+.portfolio-card h3 {
+  margin-bottom: 0.5rem;
+}
+
+.portfolio-card p {
+  color: var(--dark-gray);
+}
+
+/* ===============================
+   ACTION BUTTONS
+================================ */
+.portfolio-actions,
+.profile-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.portfolio-actions form,
+.profile-actions form {
+  display: inline;
+}
+
+/* ===============================
+   FORMS
+================================ */
+form {
+  margin-top: 1rem;
+}
+
+input,
+textarea,
+select {
+  border: 1px solid var(--light-gray);
+  border-radius: 10px;
+  padding: 0.7rem;
+  transition: border 0.15s ease;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+/* ===============================
+   FEEDBACK MESSAGE STYLING
+================================ */
+.success-message {
+  background: #dcfce7;
+  color: #166534;
+  padding: 1rem;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+}
+
+.error-message {
+  background: #fee2e2;
+  color: #991b1b;
+  padding: 1rem;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+}
+
+/* ===============================
+   FOOTER
+================================ */
+footer {
+  text-align: center;
+  padding: 2rem 0;
+  color: var(--dark-gray);
+  margin-top: 3rem;
+}
+
+/* ===============================
+   MOBILE POLISH
+================================ */
+@media (max-width: 768px) {
+  .container,
+  .portfolio-container {
+    padding: 1.25rem;
+  }
+
+  .profile-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* Adding the code below to 'OVERRIDE' the previous styles */
+
+/* public/css/ui-override.css
+   Small targeted overrides to restore the "old look":
+   - topbar: left nav + right avatar
+   - portfolios grid: two columns on desktop
+   - active badge: blue pill
+   - safe card styling to match original feel
+*/
+
+/* --- enforce topbar layout and colors --- */
+.topbar {
+  background: var(--white) !important;
+  border-bottom: 1px solid var(--light-gray);
+  box-shadow: none !important;
+}
+.topbar-inner {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  gap: 12px;
+}
+
+/* left nav items */
+.top-left {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.top-left .nav-item {
+  color: var(--text-color) !important;
+  background: transparent !important;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+.top-left .nav-item:hover {
+  background: rgba(37, 99, 235, 0.06) !important;
+  color: #1a56db !important;
+}
+.top-left .nav-item.active {
+  background: linear-gradient(90deg, var(--primary-color), #1a56db) !important;
+  color: #fff !important;
+}
+
+/* ensure root nav links (if ui-enhancements touched nav a) use text-color */
+nav a,
+.top-left a {
+  color: var(--text-color) !important;
+}
+
+/* top-right avatar area */
+.top-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto; /* keep it to the far right */
+}
+.avatar {
+  cursor: pointer;
+  border-radius: 8px;
+  border: 2px solid rgba(15, 23, 42, 0.06);
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+}
+
+/* avatar dropdown positioning (make sure it appears) */
+#avatarDropdown {
+  right: 12px !important;
+  top: 56px !important;
+  pointer-events: auto;
+}
+
+/* --- portfolio grid: two columns on desktop, single on small --- */
+.portfolios .grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(260px, 1fr)) !important;
+  gap: 14px !important;
+}
+@media (max-width: 900px) {
+  .portfolios .grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* card / portfolio card consistent look */
+.card,
+.portfolio-card {
+  background: var(--white) !important;
+  border-radius: 10px !important;
+  padding: 12px !important;
+  box-shadow: 0 6px 20px rgba(10, 10, 20, 0.04) !important;
+  border: 1px solid rgba(15, 23, 42, 0.03) !important;
+}
+
+/* --- Active badge in blue pill --- */
+.badge {
+  font-size: 12px;
+  padding: 6px 9px;
+  border-radius: 999px;
+  display: inline-block;
+}
+.badge.active {
+  background: linear-gradient(90deg, var(--primary-color), #1a56db) !important;
+  color: #fff !important;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(33, 64, 155, 0.1);
+}
+
+/* small utilities to avoid invisible text on dark skins */
+.hidden {
+  display: none !important;
+}
+
+/* small responsive tweak for tiny screens */
+@media (max-width: 640px) {
+  .top-left .nav-item {
+    display: none;
+  }
+  .avatar {
+    width: 40px;
+    height: 40px;
+  }
+}
