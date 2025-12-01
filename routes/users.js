@@ -9,7 +9,16 @@ router.get('/', async (req, res) => {
   //what should we load here, if anything?  List all users??
 });
 
-//get users/signup page with form to fill out
+router.get('/id/:id', async (req, res) => {
+  try {
+    const user = await users.getUserById(req.params.id);
+    res.json(user);
+  } catch (e) {
+    res.status(404).json({ error: e });
+  }
+});
+
+//get users/signup page with form
 router.get('/signup', async (req, res) => {
   try {
     console.log("render get users/signup");
@@ -76,9 +85,9 @@ router.post('/login', async (req, res) => {
     req.session.user = {
       firstName: user.firstName, 
       lastName: user.lastName,
-      userId: user.id
+      userId: user._id.toString()
     }
-    res.redirect('/private');
+    res.redirect('/');
   // where should we redirect the user after they're logged in??
   // probably their portfolio page '/portfolios/user/:userId' but that doesn't exist yet
   // '/private' is just what I did for a start since it's what the lecture used

@@ -17,7 +17,8 @@ app.engine('handlebars', engine({
   defaultLayout: 'main',
   helpers: {
     formatDate: handlebarsHelpers.formatDate,
-    eq: handlebarsHelpers.eq
+    eq: handlebarsHelpers.eq,
+    sortBy: handlebarsHelpers.sortBy
   }
 }));
 app.set('view engine', 'handlebars');
@@ -33,7 +34,7 @@ app.use(
     secret: 'ProFolioGlobalSessionSecret',
     saveUninitialized: false,
     resave: false,
-    cookie: { maxAge: 60000 } // maxAge in msec, so this is just 60 seconds, probably should extend that
+    cookie: { maxAge: 1800000 } // maxAge in msec, set to 30 minutes (30 * 60 * 1000)
   })
 )
 
