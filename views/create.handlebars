@@ -1,0 +1,1046 @@
+<h1>Create Your Portfolio</h1>
+<p>Fill out the form below to create your portfolio</p>
+
+{{#if error}}
+<div class="error-container">
+  <p class="error-message">{{error}}</p>
+</div>
+{{/if}}
+
+<form action="/create" method="POST" class="portfolio-form">
+  <div class="form-group">
+    <label for="title">Title:</label>
+    <input type="text" id="title" name="title" value="{{formData.title}}" required>
+  </div>
+
+  <div class="form-group">
+    <label for="description">Description:</label>
+    <textarea id="description" name="description" rows="3" required>{{formData.description}}</textarea>
+  </div>
+
+
+  <h2>Sections</h2>
+  <p>Add sections to your portfolio</p>
+
+  <div id="sections-container">
+    <!-- Sections will be added here dynamically -->
+  </div>
+
+  <div class="section-buttons">
+    <button type="button" class="btn-secondary" onclick="addSection('education')">Add Education Section</button>
+    <button type="button" class="btn-secondary" onclick="addSection('work')">Add Work Experience Section</button>
+    <button type="button" class="btn-secondary" onclick="addSection('certification')">Add Certification Section</button>
+    <button type="button" class="btn-secondary" onclick="addSection('project')">Add Project Section</button>
+    <button type="button" class="btn-secondary" onclick="addSection('custom')">Add Custom Section</button>
+  </div>
+
+  <div class="form-group checkbox-group">
+    <label for="contactButtonEnabled">
+      <input type="checkbox" id="contactButtonEnabled" name="contactButtonEnabled" {{#if formData.contactButtonEnabled}}checked{{/if}}>
+      <span>Enable "Contact Me" button</span>
+    </label>
+  </div>
+
+  <button type="submit" class="btn-primary">Create Portfolio</button>
+</form>
+
+<!-- Templates for different section types -->
+<template id="education-template">
+  <div class="section education-section">
+    <div class="section-header">
+      <h3>Education</h3>
+      <div class="section-controls">
+        <button type="button" class="btn-arrow move-up" onclick="moveSection('section-{index}', 'up')" title="Move Up">↑</button>
+        <button type="button" class="btn-arrow move-down" onclick="moveSection('section-{index}', 'down')" title="Move Down">↓</button>
+        <button type="button" class="btn-delete delete-section" onclick="deleteSection('section-{index}')">Delete Section</button>
+      </div>
+    </div>
+    <div class="section-items">
+      <div class="section-item">
+        <div class="form-group">
+          <label for="institution">Institution:</label>
+          <input type="text" name="sections[{index}][items][0][institution]" required>
+        </div>
+        <div class="form-group">
+          <label for="degree">Degree:</label>
+          <input type="text" name="sections[{index}][items][0][degree]" required>
+        </div>
+        <div class="form-group">
+          <label for="startDate">Start Date:</label>
+          <input type="date" name="sections[{index}][items][0][startDate]">
+        </div>
+        <div class="form-group">
+          <label for="endDate">End Date (leave blank if current):</label>
+          <input type="date" name="sections[{index}][items][0][endDate]">
+        </div>
+        <div class="form-group">
+          <label for="location">Location:</label>
+          <input type="text" name="sections[{index}][items][0][location]">
+        </div>
+        <div class="form-group">
+          <label for="description">Description:</label>
+          <textarea name="sections[{index}][items][0][description]" rows="3"></textarea>
+        </div>
+      </div>
+    </div>
+    <button type="button" class="btn-secondary add-entry-btn" onclick="addEntry('section-{index}')">Add Another Education Entry</button>
+    <input type="hidden" name="sections[{index}][type]" value="education">
+  </div>
+</template>
+
+<template id="education-item-template">
+  <div class="section-item">
+    <hr>
+    <div class="item-header">
+      <div class="item-controls">
+        <button type="button" class="btn-arrow move-up" onclick="moveItem(this, 'up')" title="Move Up">↑</button>
+        <button type="button" class="btn-arrow move-down" onclick="moveItem(this, 'down')" title="Move Down">↓</button>
+        <button type="button" class="btn-delete delete-item" onclick="deleteItem(this)" style="display: none;">Delete Entry</button>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="institution">Institution:</label>
+      <input type="text" name="sections[{index}][items][{itemIndex}][institution]" required>
+    </div>
+    <div class="form-group">
+      <label for="degree">Degree:</label>
+      <input type="text" name="sections[{index}][items][{itemIndex}][degree]" required>
+    </div>
+    <div class="form-group">
+      <label for="startDate">Start Date:</label>
+      <input type="date" name="sections[{index}][items][{itemIndex}][startDate]">
+    </div>
+    <div class="form-group">
+      <label for="endDate">End Date (leave blank if current):</label>
+      <input type="date" name="sections[{index}][items][{itemIndex}][endDate]">
+    </div>
+    <div class="form-group">
+      <label for="location">Location:</label>
+      <input type="text" name="sections[{index}][items][{itemIndex}][location]">
+    </div>
+    <div class="form-group">
+      <label for="description">Description:</label>
+      <textarea name="sections[{index}][items][{itemIndex}][description]" rows="3"></textarea>
+    </div>
+  </div>
+</template>
+
+<template id="work-template">
+  <div class="section work-section">
+    <div class="section-header">
+      <h3>Work Experience</h3>
+      <div class="section-controls">
+        <button type="button" class="btn-arrow move-up" onclick="moveSection('section-{index}', 'up')" title="Move Up">↑</button>
+        <button type="button" class="btn-arrow move-down" onclick="moveSection('section-{index}', 'down')" title="Move Down">↓</button>
+        <button type="button" class="btn-delete delete-section" onclick="deleteSection('section-{index}')">Delete Section</button>
+      </div>
+    </div>
+    <div class="section-items">
+      <div class="section-item">
+        <div class="form-group">
+          <label for="company">Company:</label>
+          <input type="text" name="sections[{index}][items][0][company]" required>
+        </div>
+        <div class="form-group">
+          <label for="role">Role:</label>
+          <input type="text" name="sections[{index}][items][0][role]" required>
+        </div>
+        <div class="form-group">
+          <label for="startDate">Start Date:</label>
+          <input type="date" name="sections[{index}][items][0][startDate]">
+        </div>
+        <div class="form-group">
+          <label for="endDate">End Date (leave blank if current):</label>
+          <input type="date" name="sections[{index}][items][0][endDate]">
+        </div>
+        <div class="form-group">
+          <label for="location">Location:</label>
+          <input type="text" name="sections[{index}][items][0][location]">
+        </div>
+        <div class="form-group">
+          <label for="description">Description:</label>
+          <textarea name="sections[{index}][items][0][description]" rows="3"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="achievements">Achievements (one per line):</label>
+          <textarea name="sections[{index}][items][0][achievements]" rows="3"></textarea>
+        </div>
+      </div>
+    </div>
+    <button type="button" class="btn-secondary add-entry-btn" onclick="addEntry('section-{index}')">Add Another Work Experience Entry</button>
+    <input type="hidden" name="sections[{index}][type]" value="work">
+  </div>
+</template>
+
+<template id="work-item-template">
+  <div class="section-item">
+    <hr>
+    <div class="item-header">
+      <div class="item-controls">
+        <button type="button" class="btn-arrow move-up" onclick="moveItem(this, 'up')" title="Move Up">↑</button>
+        <button type="button" class="btn-arrow move-down" onclick="moveItem(this, 'down')" title="Move Down">↓</button>
+        <button type="button" class="btn-delete delete-item" onclick="deleteItem(this)" style="display: none;">Delete Entry</button>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="company">Company:</label>
+      <input type="text" name="sections[{index}][items][{itemIndex}][company]" required>
+    </div>
+    <div class="form-group">
+      <label for="role">Role:</label>
+      <input type="text" name="sections[{index}][items][{itemIndex}][role]" required>
+    </div>
+    <div class="form-group">
+      <label for="startDate">Start Date:</label>
+      <input type="date" name="sections[{index}][items][{itemIndex}][startDate]">
+    </div>
+    <div class="form-group">
+      <label for="endDate">End Date (leave blank if current):</label>
+      <input type="date" name="sections[{index}][items][{itemIndex}][endDate]">
+    </div>
+    <div class="form-group">
+      <label for="location">Location:</label>
+      <input type="text" name="sections[{index}][items][{itemIndex}][location]">
+    </div>
+    <div class="form-group">
+      <label for="description">Description:</label>
+      <textarea name="sections[{index}][items][{itemIndex}][description]" rows="3"></textarea>
+    </div>
+    <div class="form-group">
+      <label for="achievements">Achievements (one per line):</label>
+      <textarea name="sections[{index}][items][{itemIndex}][achievements]" rows="3"></textarea>
+    </div>
+  </div>
+</template>
+
+<template id="certification-template">
+  <div class="section certification-section">
+    <div class="section-header">
+      <h3>Certification</h3>
+      <div class="section-controls">
+        <button type="button" class="btn-arrow move-up" onclick="moveSection('section-{index}', 'up')" title="Move Up">↑</button>
+        <button type="button" class="btn-arrow move-down" onclick="moveSection('section-{index}', 'down')" title="Move Down">↓</button>
+        <button type="button" class="btn-delete delete-section" onclick="deleteSection('section-{index}')">Delete Section</button>
+      </div>
+    </div>
+    <div class="section-items">
+      <div class="section-item">
+        <div class="form-group">
+          <label for="title">Title:</label>
+          <input type="text" name="sections[{index}][items][0][title]" required>
+        </div>
+        <div class="form-group">
+          <label for="issuer">Issuer:</label>
+          <input type="text" name="sections[{index}][items][0][issuer]" required>
+        </div>
+        <div class="form-group">
+          <label for="issueDate">Issue Date:</label>
+          <input type="date" name="sections[{index}][items][0][issueDate]">
+        </div>
+        <div class="form-group">
+          <label for="expirationDate">Expiration Date (if applicable):</label>
+          <input type="date" name="sections[{index}][items][0][expirationDate]">
+        </div>
+        <div class="form-group">
+          <label for="description">Description:</label>
+          <textarea name="sections[{index}][items][0][description]" rows="3"></textarea>
+        </div>
+      </div>
+    </div>
+    <button type="button" class="btn-secondary add-entry-btn" onclick="addEntry('section-{index}')">Add Another Certification Entry</button>
+    <input type="hidden" name="sections[{index}][type]" value="certification">
+  </div>
+</template>
+
+<template id="certification-item-template">
+  <div class="section-item">
+    <hr>
+    <div class="item-header">
+      <div class="item-controls">
+        <button type="button" class="btn-arrow move-up" onclick="moveItem(this, 'up')" title="Move Up">↑</button>
+        <button type="button" class="btn-arrow move-down" onclick="moveItem(this, 'down')" title="Move Down">↓</button>
+        <button type="button" class="btn-delete delete-item" onclick="deleteItem(this)" style="display: none;">Delete Entry</button>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="title">Title:</label>
+      <input type="text" name="sections[{index}][items][{itemIndex}][title]" required>
+    </div>
+    <div class="form-group">
+      <label for="issuer">Issuer:</label>
+      <input type="text" name="sections[{index}][items][{itemIndex}][issuer]" required>
+    </div>
+    <div class="form-group">
+      <label for="issueDate">Issue Date:</label>
+      <input type="date" name="sections[{index}][items][{itemIndex}][issueDate]">
+    </div>
+    <div class="form-group">
+      <label for="expirationDate">Expiration Date (if applicable):</label>
+      <input type="date" name="sections[{index}][items][{itemIndex}][expirationDate]">
+    </div>
+    <div class="form-group">
+      <label for="description">Description:</label>
+      <textarea name="sections[{index}][items][{itemIndex}][description]" rows="3"></textarea>
+    </div>
+  </div>
+</template>
+
+<template id="project-template">
+  <div class="section project-section">
+    <div class="section-header">
+      <h3>Project</h3>
+      <div class="section-controls">
+        <button type="button" class="btn-arrow move-up" onclick="moveSection('section-{index}', 'up')" title="Move Up">↑</button>
+        <button type="button" class="btn-arrow move-down" onclick="moveSection('section-{index}', 'down')" title="Move Down">↓</button>
+        <button type="button" class="btn-delete delete-section" onclick="deleteSection('section-{index}')">Delete Section</button>
+      </div>
+    </div>
+    <div class="section-items">
+      <div class="section-item">
+        <div class="form-group">
+          <label for="title">Title:</label>
+          <input type="text" name="sections[{index}][items][0][title]" required>
+        </div>
+        <div class="form-group">
+          <label for="description">Description:</label>
+          <textarea name="sections[{index}][items][0][description]" rows="3"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="technologies">Technologies (comma separated):</label>
+          <input type="text" name="sections[{index}][items][0][technologies]">
+        </div>
+        <div class="form-group">
+          <label for="startDate">Start Date:</label>
+          <input type="date" name="sections[{index}][items][0][startDate]">
+        </div>
+        <div class="form-group">
+          <label for="endDate">End Date (leave blank if current):</label>
+          <input type="date" name="sections[{index}][items][0][endDate]">
+        </div>
+        <div class="form-group">
+          <label for="githubRepo">GitHub Repository URL:</label>
+          <input type="url" name="sections[{index}][items][0][githubRepo]">
+        </div>
+      </div>
+    </div>
+    <button type="button" class="btn-secondary add-entry-btn" onclick="addEntry('section-{index}')">Add Another Project Entry</button>
+    <input type="hidden" name="sections[{index}][type]" value="project">
+  </div>
+</template>
+
+<template id="project-item-template">
+  <div class="section-item">
+    <hr>
+    <div class="item-header">
+      <div class="item-controls">
+        <button type="button" class="btn-arrow move-up" onclick="moveItem(this, 'up')" title="Move Up">↑</button>
+        <button type="button" class="btn-arrow move-down" onclick="moveItem(this, 'down')" title="Move Down">↓</button>
+        <button type="button" class="btn-delete delete-item" onclick="deleteItem(this)" style="display: none;">Delete Entry</button>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="title">Title:</label>
+      <input type="text" name="sections[{index}][items][{itemIndex}][title]" required>
+    </div>
+    <div class="form-group">
+      <label for="description">Description:</label>
+      <textarea name="sections[{index}][items][{itemIndex}][description]" rows="3"></textarea>
+    </div>
+    <div class="form-group">
+      <label for="technologies">Technologies (comma separated):</label>
+      <input type="text" name="sections[{index}][items][{itemIndex}][technologies]">
+    </div>
+    <div class="form-group">
+      <label for="startDate">Start Date:</label>
+      <input type="date" name="sections[{index}][items][{itemIndex}][startDate]">
+    </div>
+    <div class="form-group">
+      <label for="endDate">End Date (leave blank if current):</label>
+      <input type="date" name="sections[{index}][items][{itemIndex}][endDate]">
+    </div>
+    <div class="form-group">
+      <label for="githubRepo">GitHub Repository URL:</label>
+      <input type="url" name="sections[{index}][items][{itemIndex}][githubRepo]">
+    </div>
+  </div>
+</template>
+
+<template id="custom-template">
+  <div class="section custom-section">
+    <div class="section-header">
+      <h3>Custom Section</h3>
+      <div class="section-controls">
+        <button type="button" class="btn-arrow move-up" onclick="moveSection('section-{index}', 'up')" title="Move Up">↑</button>
+        <button type="button" class="btn-arrow move-down" onclick="moveSection('section-{index}', 'down')" title="Move Down">↓</button>
+        <button type="button" class="btn-delete delete-section" onclick="deleteSection('section-{index}')">Delete Section</button>
+      </div>
+    </div>
+    <div class="section-item">
+      <div class="form-group">
+        <label for="title">Title:</label>
+        <input type="text" name="sections[{index}][items][0][title]" required>
+      </div>
+      <div class="form-group">
+        <label for="content">Content:</label>
+        <div id="editor-{index}" class="quill-editor"></div>
+        <input type="hidden" name="sections[{index}][items][0][content]" id="content-{index}">
+      </div>
+      <input type="hidden" name="sections[{index}][type]" value="custom">
+    </div>
+  </div>
+</template>
+
+<!-- Include Quill.js for rich text editing -->
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+
+<script>
+  let sectionIndex = 0;
+  const quillEditors = [];
+
+  // Scroll to top if there's an error and recreate sections from form data
+  window.onload = function() {
+    if (document.querySelector('.error-container')) {
+      window.scrollTo(0, 0);
+    }
+
+    // Recreate sections from form data if available
+    const formDataJson = "{{formDataJson}}";
+    if (formDataJson) {
+      try {
+        const formData = JSON.parse(formDataJson.replace(/&quot;/g, '"'));
+        if (formData && formData.sections) {
+          const sectionsData = Array.isArray(formData.sections) ? formData.sections : [formData.sections];
+
+          // Add each section
+          sectionsData.forEach(section => {
+            if (section.type) {
+              addSection(section.type);
+
+              // Get the section container that was just added
+              const sectionContainer = document.getElementById(`section-${sectionIndex - 1}`);
+
+              // If this section has items, add them
+              if (section.items && Array.isArray(section.items)) {
+                // The first item is already added by addSection, so we start from the second item
+                for (let i = 1; i < section.items.length; i++) {
+                  addEntry(`section-${sectionIndex - 1}`);
+                }
+
+                // Now populate all items with their values
+                const itemsContainer = sectionContainer.querySelector('.section-items');
+                const itemElements = itemsContainer.querySelectorAll('.section-item');
+
+                section.items.forEach((item, itemIndex) => {
+                  if (itemIndex < itemElements.length) {
+                    const itemElement = itemElements[itemIndex];
+
+                    // Populate all inputs and textareas in this item
+                    const inputs = itemElement.querySelectorAll('input:not([type="hidden"]), textarea');
+                    inputs.forEach(input => {
+                      const name = input.getAttribute('name');
+                      if (name) {
+                        const fieldName = name.split(']').pop().replace('[', '').replace(']', '');
+                        if (item[fieldName] !== undefined) {
+                          if (input.tagName === 'TEXTAREA') {
+                            input.textContent = item[fieldName];
+                          } else {
+                            input.value = item[fieldName];
+                          }
+                        }
+                      }
+                    });
+                  }
+                });
+              }
+
+              // If this is a custom section, initialize the Quill editor with the content
+              if (section.type === 'custom' && section.items && section.items[0] && section.items[0].content) {
+                const editorId = `editor-${sectionIndex - 1}`;
+                const contentId = `content-${sectionIndex - 1}`;
+
+                setTimeout(() => {
+                  const contentInput = document.getElementById(contentId);
+                  if (contentInput) {
+                    contentInput.value = section.items[0].content;
+
+                    // If Quill is initialized, set its content
+                    const editorIndex = sectionIndex - 1;
+                    if (quillEditors[editorIndex]) {
+                      quillEditors[editorIndex].root.innerHTML = section.items[0].content;
+                    }
+                  }
+                }, 100);
+              }
+            }
+          });
+        }
+      } catch (e) {
+        console.error("Error parsing form data:", e);
+      }
+    }
+  };
+
+  function addSection(type) {
+    const container = document.getElementById('sections-container');
+    const template = document.getElementById(`${type}-template`);
+    const clone = document.importNode(template.content, true);
+
+    // Create a temporary div to hold the cloned content
+    const tempDiv = document.createElement('div');
+    tempDiv.appendChild(clone);
+
+    // Replace {index} placeholders with actual index
+    const html = tempDiv.innerHTML.replace(/{index}/g, sectionIndex);
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    div.id = `section-${sectionIndex}`;
+    div.dataset.type = type;
+    div.dataset.sectionIndex = sectionIndex;
+    container.appendChild(div);
+
+    // Fix the onclick attribute of the "Add Another Entry" button
+    const addEntryBtn = div.querySelector('.add-entry-btn');
+    if (addEntryBtn) {
+      addEntryBtn.setAttribute('onclick', `addEntry('section-${sectionIndex}')`);
+    }
+
+    // Initialize delete buttons visibility
+    // Since each section starts with only one item, the delete button should be hidden initially
+    const deleteButtons = div.querySelectorAll('.delete-item');
+    deleteButtons.forEach(button => {
+      button.style.display = 'none';
+    });
+
+    // Initialize Quill editor for custom sections
+    if (type === 'custom') {
+      const editorId = `editor-${sectionIndex}`;
+      const contentId = `content-${sectionIndex}`;
+
+      setTimeout(() => {
+        const quill = new Quill(`#${editorId}`, {
+          theme: 'snow',
+          modules: {
+            toolbar: [
+              ['bold', 'italic', 'underline', 'strike'],
+              ['blockquote', 'code-block'],
+              [{ 'header': 1 }, { 'header': 2 }],
+              [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+              [{ 'script': 'sub' }, { 'script': 'super' }],
+              [{ 'indent': '-1' }, { 'indent': '+1' }],
+              ['link', 'image'],
+              ['clean']
+            ]
+          }
+        });
+
+        quill.on('text-change', function() {
+          document.getElementById(contentId).value = quill.root.innerHTML;
+        });
+
+        quillEditors.push(quill);
+      }, 0);
+    }
+
+    sectionIndex++;
+  }
+
+  // Function to add a new entry to an existing section
+  function addEntry(sectionId) {
+    const sectionDiv = document.getElementById(sectionId);
+    const type = sectionDiv.dataset.type;
+    const sectionIndex = sectionDiv.dataset.sectionIndex;
+
+    // Don't allow adding entries to custom sections
+    if (type === 'custom') return;
+
+    // Find the items container
+    const itemsContainer = sectionDiv.querySelector('.section-items');
+
+    // Get the current number of items
+    const itemCount = itemsContainer.querySelectorAll('.section-item').length;
+
+    // Create a new item based on the section type
+    const template = document.getElementById(`${type}-item-template`);
+    const clone = document.importNode(template.content, true);
+
+    // Create a temporary div to hold the cloned content
+    const tempDiv = document.createElement('div');
+    tempDiv.appendChild(clone);
+
+    // Replace {index} and {itemIndex} placeholders
+    const html = tempDiv.innerHTML
+      .replace(/{index}/g, sectionIndex)
+      .replace(/{itemIndex}/g, itemCount);
+
+    // Append the HTML directly to the items container
+    const tempContainer = document.createElement('div');
+    tempContainer.innerHTML = html;
+
+    // Make sure we're appending the section-item element
+    if (tempContainer.querySelector('.section-item')) {
+      itemsContainer.appendChild(tempContainer.querySelector('.section-item'));
+    } else {
+      // Fallback: append the first child if section-item not found
+      itemsContainer.appendChild(tempContainer.firstChild);
+    }
+
+    // Update delete buttons visibility
+    updateDeleteButtonsVisibility(sectionDiv);
+
+    console.log('new entry added');
+  }
+
+  // Function to delete a section
+  function deleteSection(sectionId) {
+    const sectionDiv = document.getElementById(sectionId);
+    if (sectionDiv) {
+      sectionDiv.remove();
+    }
+  }
+
+  // Function to delete an item
+  function deleteItem(button) {
+    const sectionItem = button.closest('.section-item');
+    const sectionDiv = sectionItem.closest('[id^="section-"]');
+
+    if (sectionItem && sectionDiv) {
+      sectionItem.remove();
+
+      // Update delete buttons visibility
+      updateDeleteButtonsVisibility(sectionDiv);
+
+      // Renumber the remaining items to ensure proper form submission
+      renumberItems(sectionDiv);
+    }
+  }
+
+  // Function to update delete buttons visibility
+  function updateDeleteButtonsVisibility(sectionDiv) {
+    const itemsContainer = sectionDiv.querySelector('.section-items');
+    const items = itemsContainer.querySelectorAll('.section-item');
+
+    // Show delete buttons only if there are 2 or more items
+    items.forEach(item => {
+      const deleteButton = item.querySelector('.delete-item');
+      if (deleteButton) {
+        deleteButton.style.display = items.length >= 2 ? 'block' : 'none';
+      }
+    });
+  }
+
+  // Function to renumber items after deletion or reordering
+  function renumberItems(sectionDiv) {
+    const type = sectionDiv.dataset.type;
+    const sectionIndex = sectionDiv.dataset.sectionIndex;
+    const itemsContainer = sectionDiv.querySelector('.section-items');
+    const items = itemsContainer.querySelectorAll('.section-item');
+
+    items.forEach((item, index) => {
+      // Update all input and textarea names
+      const inputs = item.querySelectorAll('input, textarea');
+      inputs.forEach(input => {
+        const name = input.getAttribute('name');
+        if (name) {
+          const newName = name.replace(/sections\[\d+\]\[items\]\[\d+\]/, `sections[${sectionIndex}][items][${index}]`);
+          input.setAttribute('name', newName);
+        }
+      });
+
+      // Add order field if it doesn't exist
+      let orderInput = item.querySelector('input[name$="[order]"]');
+      if (!orderInput) {
+        orderInput = document.createElement('input');
+        orderInput.type = 'hidden';
+        orderInput.name = `sections[${sectionIndex}][items][${index}][order]`;
+        item.appendChild(orderInput);
+      } else {
+        orderInput.name = `sections[${sectionIndex}][items][${index}][order]`;
+      }
+      orderInput.value = index;
+    });
+  }
+
+  // Function to move a section up or down
+  function moveSection(sectionId, direction) {
+    const sectionDiv = document.getElementById(sectionId);
+    const container = document.getElementById('sections-container');
+    const sections = Array.from(container.children);
+    const currentIndex = sections.indexOf(sectionDiv);
+
+    if (direction === 'up' && currentIndex > 0) {
+      // Move section up
+      container.insertBefore(sectionDiv, sections[currentIndex - 1]);
+    } else if (direction === 'down' && currentIndex < sections.length - 1) {
+      // Move section down
+      container.insertBefore(sections[currentIndex + 1], sectionDiv);
+    }
+
+    // Update section order values
+    sections.forEach((section, index) => {
+      let orderInput = section.querySelector('input[name$="[order]"]');
+      if (!orderInput) {
+        orderInput = document.createElement('input');
+        orderInput.type = 'hidden';
+        orderInput.name = `sections[${section.dataset.sectionIndex}][order]`;
+        section.appendChild(orderInput);
+      }
+      orderInput.value = index;
+    });
+  }
+
+  // Function to move an item up or down
+  function moveItem(button, direction) {
+    const itemDiv = button.closest('.section-item');
+    const sectionDiv = itemDiv.closest('[id^="section-"]');
+    const itemsContainer = sectionDiv.querySelector('.section-items');
+    const items = Array.from(itemsContainer.querySelectorAll('.section-item'));
+    const currentIndex = items.indexOf(itemDiv);
+
+    if (direction === 'up' && currentIndex > 0) {
+      // Move item up
+      itemsContainer.insertBefore(itemDiv, items[currentIndex - 1]);
+    } else if (direction === 'down' && currentIndex < items.length - 1) {
+      // Move item down
+      itemsContainer.insertBefore(items[currentIndex + 1], itemDiv);
+    }
+
+    // Renumber items to ensure proper form submission
+    renumberItems(sectionDiv);
+
+    // Update delete buttons visibility
+    updateDeleteButtonsVisibility(sectionDiv);
+  }
+
+  // Handle form submission
+  document.querySelector('.portfolio-form').addEventListener('submit', function(e) {
+    // Make sure all Quill editor content is saved to hidden inputs
+    quillEditors.forEach((quill, index) => {
+      const contentId = `content-${index}`;
+      document.getElementById(contentId).value = quill.root.innerHTML;
+    });
+
+    // Process achievements (convert textarea to array)
+    const achievementsTextareas = document.querySelectorAll('textarea[name*="achievements"]');
+    achievementsTextareas.forEach(textarea => {
+      const lines = textarea.value.split('\n').filter(line => line.trim() !== '');
+      textarea.value = JSON.stringify(lines);
+    });
+
+    // Process technologies (convert comma-separated string to array)
+    const technologiesInputs = document.querySelectorAll('input[name*="technologies"]');
+    technologiesInputs.forEach(input => {
+      const techs = input.value.split(',').map(tech => tech.trim()).filter(tech => tech !== '');
+      input.value = JSON.stringify(techs);
+    });
+
+    // Ensure all sections have order fields
+    const sections = document.querySelectorAll('[id^="section-"]');
+    sections.forEach((section, index) => {
+      let orderInput = section.querySelector('input[name$="[order]"]');
+      if (!orderInput) {
+        orderInput = document.createElement('input');
+        orderInput.type = 'hidden';
+        orderInput.name = `sections[${section.dataset.sectionIndex}][order]`;
+        section.appendChild(orderInput);
+      }
+      orderInput.value = index;
+
+      // Ensure all items in this section have order fields
+      const itemsContainer = section.querySelector('.section-items');
+      if (itemsContainer) {
+        const items = itemsContainer.querySelectorAll('.section-item');
+        items.forEach((item, itemIndex) => {
+          let itemOrderInput = item.querySelector('input[name$="[order]"]');
+          if (!itemOrderInput) {
+            itemOrderInput = document.createElement('input');
+            itemOrderInput.type = 'hidden';
+            itemOrderInput.name = `sections[${section.dataset.sectionIndex}][items][${itemIndex}][order]`;
+            item.appendChild(itemOrderInput);
+          }
+          itemOrderInput.value = itemIndex;
+        });
+      }
+    });
+  });
+</script>
+
+<style>
+  /* Page Layout */
+  .portfolio-form {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    background-color: #FFFFFF;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  }
+
+  h1, h2 {
+    color: #1F2937;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    text-align: center;
+    color: #4B5563;
+    margin-bottom: 2rem;
+  }
+
+  /* Form Elements */
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #1F2937;
+  }
+
+  .form-group input[type="text"],
+  .form-group input[type="email"],
+  .form-group input[type="url"],
+  .form-group input[type="date"],
+  .form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #E5E7EB;
+    border-radius: 0.375rem;
+    font-family: inherit;
+    transition: border-color 0.2s ease;
+  }
+
+  .form-group input[type="text"]:focus,
+  .form-group input[type="email"]:focus,
+  .form-group input[type="url"]:focus,
+  .form-group input[type="date"]:focus,
+  .form-group textarea:focus {
+    border-color: #3B82F6;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  }
+
+  .form-group input[type="checkbox"] {
+    margin-right: 0.5rem;
+  }
+
+  /* Checkbox group styling */
+  .checkbox-group label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .checkbox-group input[type="checkbox"] {
+    margin: 0;
+    width: auto;
+    flex-shrink: 0;
+  }
+
+  .checkbox-group span {
+    margin: 0;
+    padding: 0;
+    display: inline-block;
+  }
+
+  /* Section Styling */
+  .section {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    border: 1px solid #E5E7EB;
+    border-radius: 0.5rem;
+    background-color: #f8fafc;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.2s ease;
+  }
+
+  .section:hover {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #E5E7EB;
+  }
+
+  .section-header h3 {
+    color: #3B82F6;
+    margin-bottom: 0;
+  }
+
+  .item-header {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1rem;
+  }
+
+  .section-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+    justify-content: center;
+  }
+
+  .section-items {
+    margin-bottom: 1.5rem;
+  }
+
+  .section-item {
+    margin-bottom: 1.5rem;
+    padding: 1.5rem;
+    background-color: #FFFFFF;
+    border-radius: 0.375rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  }
+
+  .section-item hr {
+    margin: 1.5rem 0;
+    border: 0;
+    border-top: 1px solid #E5E7EB;
+  }
+
+  /* Buttons */
+  .btn-primary, .btn-secondary {
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .btn-primary {
+    background-color: #3B82F6;
+    color: #FFFFFF;
+    border: none;
+  }
+
+  .btn-primary:hover {
+    background-color: #2563EB;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .btn-secondary {
+    background-color: #FFFFFF;
+    color: #3B82F6;
+    border: 1px solid #3B82F6;
+  }
+
+  .btn-secondary:hover {
+    background-color: #EFF6FF;
+    transform: translateY(-1px);
+  }
+
+  .btn-delete {
+    padding: 0.5rem 0.75rem;
+    font-weight: 600;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
+    background-color: #EF4444;
+    color: #FFFFFF;
+    border: none;
+    font-size: 0.875rem;
+  }
+
+  .btn-delete:hover {
+    background-color: #DC2626;
+    transform: translateY(-1px);
+  }
+
+  .delete-section {
+    margin-left: 1rem;
+  }
+
+  .delete-item {
+    margin-bottom: 0.5rem;
+  }
+
+  .btn-arrow {
+    padding: 0.3rem 0.5rem;
+    font-weight: 600;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
+    background-color: #3B82F6;
+    color: #FFFFFF;
+    border: none;
+    font-size: 0.875rem;
+    margin-right: 0.25rem;
+  }
+
+  .btn-arrow:hover {
+    background-color: #2563EB;
+    transform: translateY(-1px);
+  }
+
+  .section-controls, .item-controls {
+    display: flex;
+    align-items: center;
+  }
+
+  .add-entry-btn {
+    margin: 1rem 0 1.5rem;
+    display: block;
+    width: auto;
+  }
+
+  button[type="submit"] {
+    display: block;
+    width: 100%;
+    max-width: 300px;
+    margin: 2rem auto 0;
+    padding: 1rem;
+    font-size: 1.1rem;
+  }
+
+  /* Quill Editor */
+  .quill-editor {
+    height: 200px;
+    margin-bottom: 1.5rem;
+    border-radius: 0.375rem;
+  }
+
+  /* Error Message */
+  .error-container {
+    background-color: #FEE2E2;
+    border: 1px solid #EF4444;
+    border-radius: 0.375rem;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .error-message {
+    color: #B91C1C;
+    margin-bottom: 0;
+  }
+
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    .portfolio-form {
+      padding: 1.5rem;
+    }
+
+    .section-buttons {
+      flex-direction: column;
+    }
+
+    .btn-secondary {
+      width: 100%;
+    }
+  }
+</style>

@@ -4,15 +4,16 @@
         <p class="portfolio-description">{{portfolio.description}}</p>
     </div>
 
-    {{#each portfolio.sections}}
+    {{#each (sortBy portfolio.sections "order")}}
         <section class="portfolio-section">
             {{#if (eq this.type "education")}}
                 <h2>Education</h2>
                 <div class="section-items">
-                    {{#each this.items}}
+                    {{#each (sortBy this.items "order")}}
                         <div class="education-item">
                             <h3>{{this.institution}}</h3>
                             <h4>{{this.degree}}</h4>
+                            {{#if this.startDate}}
                             <p class="date-range">
                                 {{formatDate this.startDate}} - 
                                 {{#if this.endDate}}
@@ -21,6 +22,13 @@
                                     Present
                                 {{/if}}
                             </p>
+                            {{else}}
+                                {{#if this.endDate}}
+                                <p class="date-range">
+                                    Completed: {{formatDate this.endDate}}
+                                </p>
+                                {{/if}}
+                            {{/if}}
                             {{#if this.location}}
                                 <p class="location">{{this.location}}</p>
                             {{/if}}
@@ -35,10 +43,11 @@
             {{#if (eq this.type "work")}}
                 <h2>Work Experience</h2>
                 <div class="section-items">
-                    {{#each this.items}}
+                    {{#each (sortBy this.items "order")}}
                         <div class="work-item">
                             <h3>{{this.company}}</h3>
                             <h4>{{this.role}}</h4>
+                            {{#if this.startDate}}
                             <p class="date-range">
                                 {{formatDate this.startDate}} - 
                                 {{#if this.endDate}}
@@ -47,6 +56,7 @@
                                     Present
                                 {{/if}}
                             </p>
+                            {{/if}}
                             {{#if this.location}}
                                 <p class="location">{{this.location}}</p>
                             {{/if}}
@@ -71,14 +81,16 @@
             {{#if (eq this.type "certification")}}
                 <h2>Certifications</h2>
                 <div class="section-items">
-                    {{#each this.items}}
+                    {{#each (sortBy this.items "order")}}
                         <div class="certification-item">
                             <h3>{{this.title}}</h3>
                             <h4>{{this.issuer}}</h4>
                             <p class="date-range">
-                                Issued: {{formatDate this.issueDate}}
+                                {{#if this.issueDate}}
+                                    Issued: {{formatDate this.issueDate}}
+                                {{/if}}
                                 {{#if this.expirationDate}}
-                                    <br>Expires: {{formatDate this.expirationDate}}
+                                    {{#if this.issueDate}}<br>{{/if}}Expires: {{formatDate this.expirationDate}}
                                 {{/if}}
                             </p>
                             {{#if this.description}}
@@ -92,7 +104,7 @@
             {{#if (eq this.type "project")}}
                 <h2>Projects</h2>
                 <div class="section-items">
-                    {{#each this.items}}
+                    {{#each (sortBy this.items "order")}}
                         <div class="project-item">
                             <h3>{{this.title}}</h3>
                             {{#if this.description}}
@@ -129,14 +141,16 @@
             {{/if}}
 
             {{#if (eq this.type "custom")}}
-                {{#each this.items}}
-                    <div class="custom-section">
-                        <h2>{{this.title}}</h2>
-                        <div class="custom-content">
-                            {{{this.content}}}
+                <h2>{{this.items.[0].title}}</h2>
+                <div class="section-items">
+                    {{#each this.items}}
+                        <div class="custom-section">
+                            <div class="custom-content">
+                                {{{this.content}}}
+                            </div>
                         </div>
-                    </div>
-                {{/each}}
+                    {{/each}}
+                </div>
             {{/if}}
         </section>
     {{/each}}
