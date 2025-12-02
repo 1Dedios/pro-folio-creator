@@ -38,6 +38,12 @@ app.use(
   })
 )
 
+// Make user session data available to all templates
+app.use((req, res, next) => {
+  res.locals.user = req.session.user;
+  next();
+});
+
 app.use('/private', (req, res, next) => {
   //console.log(`session.id: ${req.session.id}`)
   if (!req.session.user) {  // no logged in user (no session.user info)

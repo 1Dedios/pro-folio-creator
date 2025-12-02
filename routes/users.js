@@ -1,5 +1,5 @@
 import express from 'express';
-import { users } from '../data/index.js';
+import { users, portfolios } from '../data/index.js';
 import bcrypt from 'bcrypt';
 const router = express.Router();
 
@@ -83,14 +83,11 @@ router.post('/login', async (req, res) => {
   try {
     match = await users.checkUser(username, password);  //checkUser throws error if passwords don't match
     req.session.user = {
-      firstName: user.firstName, 
-      lastName: user.lastName,
+      username: user.username,
       userId: user._id.toString()
     }
-    res.redirect('/');
-  // where should we redirect the user after they're logged in??
-  // probably their portfolio page '/portfolios/user/:userId' but that doesn't exist yet
-  // '/private' is just what I did for a start since it's what the lecture used
+    res.redirect('/users/profile');
+  // Redirecting to the user profile page after successful login
   }
   catch (e) {   // checkUser failed
     console.log(`error from checkUser ${e}`);
@@ -101,6 +98,28 @@ router.post('/login', async (req, res) => {
 router.get('/logout', async (req, res) => { // need to add /users/logout link for template of any page where a user is logged in
   req.session.destroy();
   res.send('Logged out');
+});
+
+router.get('/profile', async (req, res) => {
+  // Check if user is logged in
+  if (!req.session.user) {
+    return res.redirect('/users/login');
+  }
+
+  try {
+    // Get the user's portfolios
+    const userPortfolios = await portfolios.getPortfoliosByUserId(req.session.user.userId);
+
+    // Render the profile page with the user's username and portfolios
+    res.render('users/profile', { 
+      title: 'User Profile',
+      firstName: req.session.user.username,
+      portfolios: userPortfolios
+    });
+  } catch (e) {
+    console.log("Error rendering user profile page:", e);
+    res.status(500).json({ error: e });
+  }
 });
 
 router.get('/:id', async (req, res) => {
