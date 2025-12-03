@@ -15,7 +15,7 @@ import {
 // Validate portfolio title
 const validateTitle = (title) => {
   title = validateString(title, 'Portfolio title');
-  if (title.length < 3) throw 'Portfolio title must be at least 3 characters long';
+  if (title.length < 1) throw 'Portfolio title cannot be empty.';
   return title;
 };
 
@@ -84,6 +84,9 @@ const validateWorkItem = (item) => {
 
   if (item.endDate) {
     item.endDate = new Date(item.endDate);
+    if (!item.startDate) {
+      throw 'If end date is provided, start date must also be provided';
+    }
   }
 
   if (item.description) {
@@ -94,7 +97,7 @@ const validateWorkItem = (item) => {
     item.location = validateString(item.location, 'Location');
   }
 
-  if (item.achievements) {
+  if (item.achievements.length > 0) {
     item.achievements = validateArray(item.achievements, 'Achievements', (achievement) => {
       return validateString(achievement, 'Achievement');
     });
@@ -163,6 +166,9 @@ const validateProjectItem = (item) => {
 
   if (item.endDate) {
     item.endDate = new Date(item.endDate);
+    if (!item.startDate) {
+      throw 'If end date is provided, start date must also be provided';
+    }
   }
 
   if (item.githubRepo) {
@@ -212,6 +218,12 @@ const validateSection = (section) => {
 
   if (!section.items || !Array.isArray(section.items)) {
     throw 'Section must have an items array';
+  }
+
+  if (section.order === undefined) {
+    section.order = 0;
+  } else if (typeof section.order !== 'number') {
+    throw 'Section order must be a number';
   }
 
   // Validate items based on section type
@@ -296,6 +308,7 @@ export const createPortfolio = async (
   contactButtonEnabled = validateBoolean(contactButtonEnabled, 'Contact button enabled');
 
   if (contactButtonEnabled && contactEmail) {
+    console.log('contactButtonEnabled');
     contactEmail = validateEmail(contactEmail);
   } else if (contactButtonEnabled) {
     // If contact is enabled but no email provided, get user's email
@@ -312,6 +325,11 @@ export const createPortfolio = async (
 
   // Validate sections
   sections = sections.map(validateSection);
+
+  // Ensure at least one section exists
+  if (sections.length === 0) {
+    throw 'Portfolio must have at least one section of any type';
+  }
 
   // Validate layout
   layout = validateLayout(layout);
@@ -432,6 +450,11 @@ export const updatePortfolio = async (
 
   // Validate sections
   sections = sections.map(validateSection);
+
+  // Ensure at least one section exists
+  if (sections.length === 0) {
+    throw 'Portfolio must have at least one section of any type';
+  }
 
   // Validate layout
   layout = validateLayout(layout);
