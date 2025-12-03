@@ -1,13 +1,8 @@
 import express from 'express';
-<<<<<<< HEAD
-import { users, messages, themes, portfolios } from '../data/index.js';
-import pagesRouter from './pages.js';
-=======
 import {messages, portfolios, themes, users} from '../data/index.js';
 import pagesRouter from './pages.js';
 import usersRouter from './users.js';
 import privateRoutes from './private.js';
->>>>>>> main
 
 const apiRouter = express.Router();
 
@@ -100,14 +95,9 @@ apiRouter.get('/messages/user/:userId', async (req, res) => {
 // Configure routes
 const constructorMethod = (app) => {
   app.use('/', pagesRouter);
-<<<<<<< HEAD
-
-  app.use('/api', router);
-=======
   app.use('/users', usersRouter);
   app.use('/api', apiRouter);
   app.use('/private', privateRoutes);
->>>>>>> main
 
   app.use((req, res) => {
     res.status(404).json({ error: 'Not found' });

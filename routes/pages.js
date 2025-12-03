@@ -3,8 +3,14 @@ import {portfolios} from "../data/index.js";
 
 const router = express.Router();
 
-router.get('/', (req, res) => {
-    res.render('home', { title: 'ProFolio'});
+router.get('/', async (req, res) => {
+    try {
+        const examples = await portfolios.getExamplePortfolios();
+        
+        res.render('home', { title: 'ProFolio', examples: examples });
+    } catch (e) {
+        res.status(500).json({ error: 'Could not load portfolios'});
+    }
 });
 
 router.get('/create', (req, res) => {                          

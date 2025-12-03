@@ -4,26 +4,14 @@ import session from 'express-session';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import configRoutes from './routes/index.js';
-<<<<<<< HEAD
-import exphbs from 'express-handlebars';
-=======
 import * as handlebarsHelpers from './views/helpers.js';
 
 // Get the directory name of the current module
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
->>>>>>> main
 
 const app = express();
 
-<<<<<<< HEAD
-app.use('/public', express.static('public'));
-app.use(express.urlencoded({extended: true}));
-
-app.engine('handlebars', exphbs.engine({defaultLayout: 'main'}));
-app.set('view engine', 'handlebars');
-
-=======
 // Configure express-handlebars
 app.engine('handlebars', engine({
   defaultLayout: 'main',
@@ -72,7 +60,6 @@ app.use('/users/login', (req, res, next) => {
 });
 
 // Configure routes
->>>>>>> main
 configRoutes(app);
 
 app.listen(3000, () => {
