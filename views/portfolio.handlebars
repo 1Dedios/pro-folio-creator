@@ -2,6 +2,12 @@
     <div class="portfolio-header">
         <h1>{{portfolio.title}}</h1>
         <p class="portfolio-description">{{portfolio.description}}</p>
+
+        {{#if currentUser}}
+            <form action="/portfolio/{{portfolio._id}}/copy" method="POST" style="display:inline">
+                <button type="submit" class="btn-copy">Copy this portfolio</button>
+            </form>
+        {{/if}}
     </div>
 
     {{#each (sortBy portfolio.sections "order")}}
