@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node app.js",
+    "dev": "node --watch --env-file=.env.local app.js",
     "seed": "node tasks/seed.js"
   },
   "repository": {
