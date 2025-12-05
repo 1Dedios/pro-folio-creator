@@ -30,3 +30,10 @@ export const sortBy = (array, property) => {
 
     return sortedArray;
 };
+
+export function ifEquals(a, b, opts) {
+  if (String(a) === String(b)) {
+    return opts.fn(this);
+  }
+  return opts.inverse(this);
+}
