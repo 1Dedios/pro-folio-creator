@@ -73,6 +73,69 @@ apiRouter.get('/portfolios/:id', async (req, res) => {
   }
 });
 
+// Activate a portfolio (set as user's active portfolio)
+apiRouter.post("/portfolios/:id/activate", async (req, res) => {
+  try {
+    // must be logged in (we rely on session.user.userId)
+    if (!req.session || !req.session.user || !req.session.user.userId) {
+      return res.status(401).json({ error: "Not logged in" });
+    }
+    const userId = req.session.user.userId;
+    const portfolioId = req.params.id;
+
+    // verify portfolio exists and is owned by this user
+    const portfolio = await portfolios.getPortfolioById(portfolioId);
+    if (!portfolio)
+      return res.status(404).json({ error: "Portfolio not found" });
+
+    // owner check (ownerId may be ObjectId; convert to string)
+    if (String(portfolio.ownerId) !== String(userId)) {
+      console.warn("Activate attempt by non-owner", { portfolioId, userId });
+      return res.status(403).json({ error: "Not authorized" });
+    }
+
+    // update user's active portfolio
+    const updatedUser = await users.updateActivePortfolio(userId, portfolioId);
+    return res.json({
+      success: true,
+      userId: updatedUser._id ? String(updatedUser._id) : userId,
+      activePortfolioId: updatedUser.activePortfolioId
+        ? String(updatedUser.activePortfolioId)
+        : portfolioId,
+    });
+  } catch (e) {
+    console.error("Error activating portfolio:", e);
+    return res.status(500).json({ error: String(e) });
+  }
+});
+
+// Delete a portfolio
+apiRouter.post('/portfolios/:id/delete', async (req, res) => {
+  try {
+    if (!req.session || !req.session.user || !req.session.user.userId) {
+      return res.status(401).json({ error: 'Not logged in' });
+    }
+    const userId = req.session.user.userId;
+    const portfolioId = req.params.id;
+
+    // verify portfolio exists and is owned by this user
+    const portfolio = await portfolios.getPortfolioById(portfolioId);
+    if (!portfolio) return res.status(404).json({ error: 'Portfolio not found' });
+
+    if (String(portfolio.ownerId) !== String(userId)) {
+      console.warn('Delete attempt by non-owner', { portfolioId, userId });
+      return res.status(403).json({ error: 'Not authorized' });
+    }
+
+    // perform deletion (this should also unset activePortfolioId in data layer)
+    const result = await portfolios.removePortfolio(portfolioId);
+    return res.json({ deleted: true, portfolioId: portfolioId });
+  } catch (e) {
+    console.error('Error deleting portfolio:', e);
+    return res.status(500).json({ error: String(e) });
+  }
+});
+
 // Message routes
 apiRouter.get('/messages/portfolio/:portfolioId', async (req, res) => {
   try {

@@ -18,7 +18,8 @@ app.engine('handlebars', engine({
   helpers: {
     formatDate: handlebarsHelpers.formatDate,
     eq: handlebarsHelpers.eq,
-    sortBy: handlebarsHelpers.sortBy
+    sortBy: handlebarsHelpers.sortBy,
+    ifEquals: handlebarsHelpers.ifEquals
   }
 }));
 app.set('view engine', 'handlebars');
