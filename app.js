@@ -14,19 +14,17 @@ const __dirname = dirname(__filename);
 const app = express();
 
 // Configure express-handlebars
-app.engine(
-  "handlebars",
-  engine({
-    defaultLayout: "main",
-    helpers: {
-      formatDate: handlebarsHelpers.formatDate,
-      eq: handlebarsHelpers.eq,
-      sortBy: handlebarsHelpers.sortBy,
-    },
-  })
-);
-app.set("view engine", "handlebars");
-app.set("views", join(__dirname, "views"));
+app.engine('handlebars', engine({
+  defaultLayout: 'main',
+  helpers: {
+    formatDate: handlebarsHelpers.formatDate,
+    eq: handlebarsHelpers.eq,
+    sortBy: handlebarsHelpers.sortBy,
+    ifEquals: handlebarsHelpers.ifEquals
+  }
+}));
+app.set('view engine', 'handlebars');
+app.set('views', join(__dirname, 'views'));
 
 // Middleware
 app.use(express.json());
