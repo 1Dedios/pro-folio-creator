@@ -108,14 +108,14 @@ router.get('/profile', async (req, res) => {
 
   try {
     // Load full user from DB
-    const fullUser = await users.getUserById(req.session.user.userId);
+    const fullUser = await users.getUserById(req.session?.user.userId);
     if (!fullUser) {
-      console.log('User not found for session id:', req.session.user.userId);
+      console.log('User not found for session id:', req.session?.user.userId);
       return res.status(404).render('error', { message: 'User not found' });
     }
 
     // Load user's portfolios
-    let userPortfolios = await portfolios.getPortfoliosByUserId(req.session.user.userId);
+    let userPortfolios = await portfolios.getPortfoliosByUserId(req.session?.user.userId);
     userPortfolios = (userPortfolios || []).map((p) => ({
       ...p,
       _id: String(p._id),
@@ -141,7 +141,7 @@ router.get('/profile', async (req, res) => {
     // Pass user JSON string for client JS and the normal user object for templates
     res.render('users/profile', {
       title: 'User Profile',
-      firstName: req.session.user.username,
+      firstName: req.session?.user.username,
       user: userForTemplate,
       portfolios: userPortfolios,
       userJson// <-- important
