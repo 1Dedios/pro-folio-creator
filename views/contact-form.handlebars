@@ -1,0 +1,37 @@
+<h1>{{pageTitle}}</h1>
+<form class="form-group" action="/contact-form/{{portfolioId}}" method="POST">
+  <p>
+    Enjoyed my Pro-folio?! I hope so. <br />
+    If you have any questions or suggestions please reach out.
+  </p>
+  <input type="hidden" name="portfolioId" value="{{portfolioId}}" />
+  <label for="senderName">Your Name:<span>*</span></label>
+  <input
+    type="text"
+    name="senderName"
+    id="senderName"
+    placeholder="Enter your name"
+    required
+  />
+  <label for="senderEmail">Your Email:<span>*</span></label>
+  <input
+    type="email"
+    name="senderEmail"
+    id="senderEmail"
+    placeholder="Enter your email"
+    required
+  />
+  <label for="message">Message:<span>*</span></label>
+  <textarea
+    name="message"
+    id="message"
+    cols="33"
+    rows="5"
+    minlength="10"
+    maxlength="1000"
+    placeholder="Enter your message..."
+    required
+  ></textarea>
+
+  <button class="btn-primary" type="submit">Submit</button>
+</form>
