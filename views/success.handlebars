@@ -1,7 +1,9 @@
 <h1>MESSAGE SUCCESSFULLY SENT! 😏</h1>
+<p>Thank you, {{senderName}}.</p>
+<p>redirecting soon...</p>
+
 <script>
   setTimeout(function() {
-      window.location.href = `{{${redirectUrl}}}`
-
+    window.location.href = '/portfolio/{{portfolioId}}'
   }, {{delay}})
 </script>
