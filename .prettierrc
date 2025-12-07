@@ -1,0 +1,6 @@
+{
+  "overrides": [
+    { "files": "*.handlebars", "options": { "parser": "html" } },
+    { "files": ".prettierrc", "options": { "parser": "json" } }
+  ]
+}
