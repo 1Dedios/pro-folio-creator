@@ -104,19 +104,49 @@ router.get('/logout', async (req, res) => { // need to add /users/logout link fo
 
 router.get('/profile', async (req, res) => {
   // Check if user is logged in
-  if (!req.session.user) {
+  if (!req.session?.user) {
     return res.redirect('/users/login');
   }
 
   try {
-    // Get the user's portfolios
-    const userPortfolios = await portfolios.getPortfoliosByUserId(req.session.user.userId);
+    // Load full user from DB
+    const fullUser = await users.getUserById(req.session?.user.userId);
+    if (!fullUser) {
+      console.log('User not found for session id:', req.session?.user.userId);
+      return res.status(404).render('error', { message: 'User not found' });
+    }
 
-    // Render the profile page with the user's username and portfolios
-    res.render('users/profile', { 
+    // Load user's portfolios
+    let userPortfolios = await portfolios.getPortfoliosByUserId(req.session?.user.userId);
+    userPortfolios = (userPortfolios || []).map((p) => ({
+      ...p,
+      _id: String(p._id),
+      ownerId: String(p.ownerId),
+    }));
+
+    // Normalise fullUser for templates (string IDs)
+    const userForTemplate = {
+      ...fullUser,
+      _id: String(fullUser._id),
+      activePortfolioId: fullUser.activePortfolioId ? String(fullUser.activePortfolioId) : null
+    };
+
+    
+
+    // create JSON string to be safely injected into client JS
+    const userJson = JSON.stringify({
+  _id: userForTemplate._id,
+  username: userForTemplate.username,
+  activePortfolioId: userForTemplate.activePortfolioId || null
+  });
+
+    // Pass user JSON string for client JS and the normal user object for templates
+    res.render('users/profile', {
       title: 'User Profile',
-      firstName: req.session.user.username,
-      portfolios: userPortfolios
+      firstName: req.session?.user.username,
+      user: userForTemplate,
+      portfolios: userPortfolios,
+      userJson// <-- important
     });
   } catch (e) {
     console.log("Error rendering user profile page:", e);

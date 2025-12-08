@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node app.js",
+    "dev": "node --watch --env-file=.env.local app.js",
     "seed": "node tasks/seed.js"
   },
   "repository": {
@@ -24,6 +25,7 @@
     "express-handlebars": "^8.0.3",
     "mongodb": "^7.0.0",
     "quill": "^2.0.3",
-    "express-session": "^1.18.2"
+    "express-session": "^1.18.2",
+    "nodemailer": "^7.0.11"
   }
 }

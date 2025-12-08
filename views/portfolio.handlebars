@@ -2,6 +2,12 @@
     <div class="portfolio-header">
         <h1>{{portfolio.title}}</h1>
         <p class="portfolio-description">{{portfolio.description}}</p>
+
+        {{#if currentUser}}
+            <form action="/portfolio/{{portfolio._id}}/copy" method="POST" style="display:inline">
+                <button type="submit" class="btn-copy">Copy this portfolio</button>
+            </form>
+        {{/if}}
     </div>
 
     {{#each (sortBy portfolio.sections "order")}}
@@ -158,21 +164,7 @@
     {{#if portfolio.contactButtonEnabled}}
         <div class="contact-section">
             <h2>Contact Me</h2>
-            <form id="contact-form" action="/contact/{{portfolio._id}}" method="POST">
-                <div class="form-group">
-                    <label for="senderName">Your Name</label>
-                    <input type="text" id="senderName" name="senderName" required>
-                </div>
-                <div class="form-group">
-                    <label for="senderEmail">Your Email</label>
-                    <input type="email" id="senderEmail" name="senderEmail" required>
-                </div>
-                <div class="form-group">
-                    <label for="message">Message</label>
-                    <textarea id="message" name="message" rows="5" required></textarea>
-                </div>
-                <button type="submit" class="btn-primary">Send Message</button>
-            </form>
+            <a href="/contact-form/{{portfolio._id}}" class="btn-primary contact-button">Contact Me</a>
         </div>
     {{/if}}
 </div>

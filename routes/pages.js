@@ -4,8 +4,14 @@ import { ObjectId } from 'mongodb';
 
 const router = express.Router();
 
-router.get('/', (req, res) => {
-    res.render('home', { title: 'ProFolio'});
+router.get('/', async (req, res) => {
+    try {
+        const examples = await portfolios.getExamplePortfolios();
+        
+        res.render('home', { title: 'ProFolio', examples: examples });
+    } catch (e) {
+        res.status(500).json({ error: 'Could not load portfolios'});
+    }
 });
 
 router.get('/create', (req, res) => {
@@ -146,10 +152,37 @@ router.get('/portfolio/:id', async (req, res) => {
 
         res.render('portfolio', {
             title: portfolio.title,
-            portfolio: portfolio
+            portfolio: portfolio,
+            currentUser: req.session.user
         });
     } catch (e) {
         res.status(404).json({ error: 'Not found' });
+    }
+});
+
+router.post('/portfolio/:id/copy', async (req, res) => {
+    try {
+        const initial = await portfolios.getPortfolioById(req.params.id);      //find original portfolio by ID
+        
+        if (!req.session.user) {                                                //ensure user is logged in
+            return res.status(401).send("Must be logged in to copy a portfolio.");
+        }
+        await portfolios.createPortfolio(
+            new ObjectId(req.session.user.userId),
+            initial.title + ' - Copy',
+            initial.description,
+            initial.sections,
+            initial.pages || { singlePage: true, pages: [] },
+            initial.themeId,
+            initial.contactButtonEnabled,
+            null,
+            false,
+            initial._id
+        );
+        res.redirect('/users/profile');
+    } catch (e) {
+        console.error(e);
+        res.status(500).send("Error copying portfolio");
     }
 });
 
