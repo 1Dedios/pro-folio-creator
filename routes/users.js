@@ -98,8 +98,8 @@ router.post('/login', async (req, res) => {
 
 router.get('/logout', async (req, res) => { // need to add /users/logout link for template of any page where a user is logged in
   req.session.destroy();
-  res.send('Logged out');
-  //res.redirect('/');
+  //res.send('Logged out');
+  res.redirect('/');
 });
 
 router.get('/profile', async (req, res) => {
