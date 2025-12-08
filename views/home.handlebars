@@ -3,21 +3,19 @@
 
 <div class="home-buttons">
     <a href="/create" class="button-create">Create Portfolio!</a>
-    <a href="/users/signup" class="button-signup">Sign Up</a>
-    <a href="/users/login" class="button-login">Log In</a>
     <a href="/portfolios/examples" class="button-examples">View Some Examples</a>
 </div>
 
 <section class="example-portfolios">
     <h2>Example Portfolios</h2>
     {{#if examples}}
-        <ul>
+    <ul>
         {{#each examples}}
-            <li><a href ="/portfolio/{{this._id}}">{{this.title}}</a></li>
+        <li><a href="/portfolio/{{this._id}}">{{this.title}}</a></li>
         {{/each}}
-        </ul>
+    </ul>
     {{else}}
-        <p>No examples exist!</p>
+    <p>No examples exist!</p>
     {{/if}}
 </section>
 
