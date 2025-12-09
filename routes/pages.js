@@ -153,4 +153,26 @@ router.get('/portfolio/:id', async (req, res) => {
     }
 });
 
+router.get('/portfolio/:id/edit', async (req, res) => {
+  try {
+    if (!req.session?.user) return res.redirect('/users/login');
+
+    const portfolio = await portfolios.getPortfolioById(req.params.id);
+
+    // authorize: only owner may edit
+    if (String(portfolio.ownerId) !== String(req.session.user.userId)) {
+      return res.status(403).render('error', { message: 'Not authorized to edit this portfolio' });
+    }
+
+    // render an edit view (you need to create views/portfolio_edit.handlebars)
+    res.render('portfolio_edit', {
+      title: `Edit: ${portfolio.title}`,
+      portfolio
+    });
+  } catch (e) {
+    console.error('Error loading edit page:', e);
+    return res.status(404).render('error', { message: 'Portfolio not found' });
+  }
+});
+
 export default router;
