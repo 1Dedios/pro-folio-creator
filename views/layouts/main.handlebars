@@ -25,6 +25,14 @@
 
     <footer>ProFolio</footer>
 
+    <script>
+        // If server passed userJson it will be an object literal here; else use null
+        window.__APP_USER = {{{ userJson }}} || null;
+        window.__APP_ACTIVE = window.__APP_USER ? window.__APP_USER.activePortfolioId || null : null;
+        // console.log('APP_USER:', window.__APP_USER, 'APP_ACTIVE:', window.__APP_ACTIVE);
+    </script>
+
+    <script type="module" src="/public/js/portfolios.js" defer></script>
 
 
 </body>
