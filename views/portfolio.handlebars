@@ -4,13 +4,30 @@
         <p class="portfolio-description">{{portfolio.description}}</p>
 
         {{#if currentUser}}
-            <form action="/portfolio/{{portfolio._id}}/copy" method="POST" style="display:inline">
-                <button type="submit" class="btn-copy">Copy this portfolio</button>
-            </form>
+            <div class="portfolio-actions">
+                {{#if (eq currentUser.userId (toString portfolio.ownerId))}}
+                    <a href="/portfolio/{{portfolio._id}}/edit" class="btn-edit">Edit Portfolio</a>
+                {{/if}}
+                <form action="/portfolio/{{portfolio._id}}/copy" method="POST" style="display:inline">
+                    <button type="submit" class="btn-copy">Copy this portfolio</button>
+                </form>
+            </div>
         {{/if}}
     </div>
 
-    {{#each (sortBy portfolio.sections "order")}}
+    {{#unless portfolio.layout.singlePage}}
+        <div class="portfolio-navigation">
+            <ul class="page-tabs">
+                {{#each portfolio.layout.pages}}
+                    <li class="page-tab {{#if (eq @index ../currentPageIndex)}}active{{/if}}">
+                        <a href="/portfolio/{{../portfolio._id}}?page={{@index}}">{{this.title}}</a>
+                    </li>
+                {{/each}}
+            </ul>
+        </div>
+    {{/unless}}
+
+    {{#each (sortBy (default filteredSections portfolio.sections) "order")}}
         <section class="portfolio-section">
             {{#if (eq this.type "education")}}
                 <h2>Education</h2>
