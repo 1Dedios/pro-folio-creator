@@ -82,8 +82,9 @@ router.post('/login', async (req, res) => {
   let match = {};
   try {
     match = await users.checkUser(username, password);  //checkUser throws error if passwords don't match
-    req.session.user = {
+    req.session.user = {  // setting session.user to indicate that the user is logged in
       username: user.username,
+      email: user.email,
       userId: user._id.toString()
     }
     res.redirect('/users/profile');
@@ -97,7 +98,8 @@ router.post('/login', async (req, res) => {
 
 router.get('/logout', async (req, res) => { // need to add /users/logout link for template of any page where a user is logged in
   req.session.destroy();
-  res.send('Logged out');
+  //res.send('Logged out');
+  res.redirect('/');
 });
 
 router.get('/profile', async (req, res) => {
@@ -108,14 +110,14 @@ router.get('/profile', async (req, res) => {
 
   try {
     // Load full user from DB
-    const fullUser = await users.getUserById(req.session.user.userId);
+    const fullUser = await users.getUserById(req.session?.user.userId);
     if (!fullUser) {
-      console.log('User not found for session id:', req.session.user.userId);
+      console.log('User not found for session id:', req.session?.user.userId);
       return res.status(404).render('error', { message: 'User not found' });
     }
 
     // Load user's portfolios
-    let userPortfolios = await portfolios.getPortfoliosByUserId(req.session.user.userId);
+    let userPortfolios = await portfolios.getPortfoliosByUserId(req.session?.user.userId);
     userPortfolios = (userPortfolios || []).map((p) => ({
       ...p,
       _id: String(p._id),
@@ -141,7 +143,7 @@ router.get('/profile', async (req, res) => {
     // Pass user JSON string for client JS and the normal user object for templates
     res.render('users/profile', {
       title: 'User Profile',
-      firstName: req.session.user.username,
+      firstName: req.session?.user.username,
       user: userForTemplate,
       portfolios: userPortfolios,
       userJson// <-- important

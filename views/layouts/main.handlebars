@@ -9,12 +9,18 @@
 </head>
 
 <body>
-    <header>
-        <nav>
+    <header class="common-header">
+        <div class="header-left">
+            <a href="/"><img src="/public/images/ProFolio-Logo.png" alt="Logo" class="nav-logo"></a>
+        </div>
+        <nav class="header-nav">
             <ul>
-                <li><a href="/">Home</a></li>
                 {{#if user}}
                 <li><a href="/users/profile">Profile</a></li>
+                <li><a href="/users/logout">Log Out</a></li>
+                {{else}}
+                <li><a href="/users/signup">Sign Up</a></li>
+                <li><a href="/users/login">Log In</a></li>
                 {{/if}}
             </ul>
         </nav>
@@ -28,8 +34,8 @@
 
     <script>
         // If server passed userJson it will be an object literal here; else use null
-        window.__APP_USER = {{{ userJson }}} || null;
-        window.__APP_ACTIVE = window.__APP_USER ? window.__APP_USER.activePortfolioId || null : null;
+        window.__APP_USER = {{#if userJson}}{{{ userJson }}}{{else}}null{{/if}};
+        window.__APP_ACTIVE = window.__APP_USER && window.__APP_USER.activePortfolioId ? window.__APP_USER.activePortfolioId : null;
         // console.log('APP_USER:', window.__APP_USER, 'APP_ACTIVE:', window.__APP_ACTIVE);
     </script>
 
