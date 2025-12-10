@@ -505,9 +505,13 @@
             }
           }
 
-          // Add each section
+          // First, add all sections to the DOM
+          console.log("[DEBUG_LOG] First phase: Adding all sections to the DOM");
+          const sectionsData = [];
+
           portfolio.sections.forEach(section => {
             if (section.type) {
+              console.log(`[DEBUG_LOG] Adding section of type: ${section.type}`);
               addSection(section.type);
 
               // Get the section container that was just added
@@ -516,167 +520,179 @@
               // Store the section ID for later use
               sectionContainer.dataset.sectionId = section._id;
 
+              // Store section data for later processing
+              sectionsData.push({
+                section: section,
+                sectionContainer: sectionContainer,
+                sectionIndex: sectionIndex - 1
+              });
+
               // If this section has items, add them
               if (section.items && Array.isArray(section.items)) {
                 // The first item is already added by addSection, so we start from the second item
                 for (let i = 1; i < section.items.length; i++) {
                   addEntry(`section-${sectionIndex - 1}`);
                 }
+              }
+            }
+          });
 
-                // Now populate all items with their values
-                // Add a small delay to ensure the DOM is fully updated
-                console.log(`[DEBUG_LOG] Setting timeout to populate items for section ${section.type}`);
-                setTimeout(() => {
-                  console.log(`[DEBUG_LOG] Timeout fired, starting to populate items for section ${section.type}`);
+          // After all sections are added to the DOM, populate their values
+          console.log("[DEBUG_LOG] Second phase: Populating all sections with values");
+          setTimeout(() => {
+            sectionsData.forEach(({ section, sectionContainer, sectionIndex }) => {
+              console.log(`[DEBUG_LOG] Populating section of type: ${section.type}`);
 
-                  const itemsContainer = sectionContainer.querySelector('.section-items');
-                  if (!itemsContainer) {
-                    console.error(`[DEBUG_LOG] ERROR: Items container not found for section ${section.type}`);
-                    console.error(`[DEBUG_LOG] Section container:`, sectionContainer);
-                    console.error(`[DEBUG_LOG] Section container HTML:`, sectionContainer.outerHTML);
-                    return;
-                  }
-                  console.log(`[DEBUG_LOG] Found items container for section ${section.type}:`, itemsContainer);
+              // If this section has items, populate them
+              if (section.items && Array.isArray(section.items)) {
+                const itemsContainer = sectionContainer.querySelector('.section-items');
+                if (!itemsContainer) {
+                  console.error(`[DEBUG_LOG] ERROR: Items container not found for section ${section.type}`);
+                  console.error(`[DEBUG_LOG] Section container:`, sectionContainer);
+                  console.error(`[DEBUG_LOG] Section container HTML:`, sectionContainer.outerHTML);
+                  return;
+                }
+                console.log(`[DEBUG_LOG] Found items container for section ${section.type}:`, itemsContainer);
 
-                  const itemElements = itemsContainer.querySelectorAll('.section-item');
-                  console.log(`[DEBUG_LOG] Found ${itemElements.length} item elements for section ${section.type}`);
+                const itemElements = itemsContainer.querySelectorAll('.section-item');
+                console.log(`[DEBUG_LOG] Found ${itemElements.length} item elements for section ${section.type}`);
 
-                  if (itemElements.length === 0) {
-                    console.error(`[DEBUG_LOG] ERROR: No item elements found for section ${section.type}`);
-                    console.log(`[DEBUG_LOG] Items container HTML:`, itemsContainer.outerHTML);
-                  }
+                if (itemElements.length === 0) {
+                  console.error(`[DEBUG_LOG] ERROR: No item elements found for section ${section.type}`);
+                  console.log(`[DEBUG_LOG] Items container HTML:`, itemsContainer.outerHTML);
+                }
 
-                  if (section.items.length > itemElements.length) {
-                    console.warn(`[DEBUG_LOG] WARNING: Section has ${section.items.length} items but only ${itemElements.length} item elements were found`);
-                  }
+                if (section.items.length > itemElements.length) {
+                  console.warn(`[DEBUG_LOG] WARNING: Section has ${section.items.length} items but only ${itemElements.length} item elements were found`);
+                }
 
-                  section.items.forEach((item, itemIndex) => {
-                    console.log(`[DEBUG_LOG] Processing section ${section.type}, Item ${itemIndex}:`, JSON.stringify(item));
+                section.items.forEach((item, itemIndex) => {
+                  console.log(`[DEBUG_LOG] Processing section ${section.type}, Item ${itemIndex}:`, JSON.stringify(item));
 
-                    if (itemIndex < itemElements.length) {
-                      const itemElement = itemElements[itemIndex];
-                      console.log(`[DEBUG_LOG] Found item element for ${section.type}, Item ${itemIndex}:`, itemElement);
+                  if (itemIndex < itemElements.length) {
+                    const itemElement = itemElements[itemIndex];
+                    console.log(`[DEBUG_LOG] Found item element for ${section.type}, Item ${itemIndex}:`, itemElement);
 
-                      // Store the item ID for later use
-                      itemElement.dataset.itemId = item._id;
-                      console.log(`[DEBUG_LOG] Set item ID: ${item._id} on element`);
+                    // Store the item ID for later use
+                    itemElement.dataset.itemId = item._id;
+                    console.log(`[DEBUG_LOG] Set item ID: ${item._id} on element`);
 
-                      // Populate all inputs and textareas in this item
-                      const inputs = itemElement.querySelectorAll('input:not([type="hidden"]), textarea');
-                      console.log(`[DEBUG_LOG] Found ${inputs.length} inputs/textareas for ${section.type}, Item ${itemIndex}`);
+                    // Populate all inputs and textareas in this item
+                    const inputs = itemElement.querySelectorAll('input:not([type="hidden"]), textarea');
+                    console.log(`[DEBUG_LOG] Found ${inputs.length} inputs/textareas for ${section.type}, Item ${itemIndex}`);
 
-                      if (inputs.length === 0) {
-                        console.error(`[DEBUG_LOG] ERROR: No input elements found for section ${section.type}, item ${itemIndex}`);
-                        console.log(`[DEBUG_LOG] Item element HTML:`, itemElement.outerHTML);
+                    if (inputs.length === 0) {
+                      console.error(`[DEBUG_LOG] ERROR: No input elements found for section ${section.type}, item ${itemIndex}`);
+                      console.log(`[DEBUG_LOG] Item element HTML:`, itemElement.outerHTML);
+                    }
+
+                    inputs.forEach(input => {
+                      const name = input.getAttribute('name');
+                      console.log(`[DEBUG_LOG] Processing input: name=${name}, type=${input.type}, tagName=${input.tagName}`);
+
+                      if (!name) {
+                        console.warn(`[DEBUG_LOG] WARNING: Input has no name attribute:`, input);
+                        return;
                       }
 
-                      inputs.forEach(input => {
-                        const name = input.getAttribute('name');
-                        console.log(`[DEBUG_LOG] Processing input: name=${name}, type=${input.type}, tagName=${input.tagName}`);
+                      try {
+                        // Extract the field name from the name attribute
+                        // The name format is like: sections[{index}][items][{itemIndex}][fieldName]
+                        // We need to extract the last part (fieldName)
+                        const matches = name.match(/\[([^\]]+)\]$/);
+                        const fieldName = matches ? matches[1] : '';
+                        console.log(`[DEBUG_LOG] Extracted field name: ${fieldName}, value in item: ${JSON.stringify(item[fieldName])}`);
 
-                        if (!name) {
-                          console.warn(`[DEBUG_LOG] WARNING: Input has no name attribute:`, input);
-                          return;
-                        }
+                        if (item[fieldName] !== undefined) {
+                          console.log(`[DEBUG_LOG] Setting value for field ${fieldName} to ${JSON.stringify(item[fieldName])}`);
 
-                        try {
-                          const fieldName = name.split(']').pop().replace('[', '').replace(']', '');
-                          console.log(`[DEBUG_LOG] Extracted field name: ${fieldName}, value in item: ${JSON.stringify(item[fieldName])}`);
+                          // Handle special cases
+                          if (fieldName === 'achievements' && Array.isArray(item[fieldName])) {
+                            const value = item[fieldName].join('\n');
+                            console.log(`[DEBUG_LOG] Setting achievements value: ${value}`);
+                            input.value = value;
+                            console.log(`[DEBUG_LOG] After setting, achievements value is: ${input.value}`);
+                          } else if (fieldName === 'technologies' && Array.isArray(item[fieldName])) {
+                            const value = item[fieldName].join(', ');
+                            console.log(`[DEBUG_LOG] Setting technologies value: ${value}`);
+                            input.value = value;
+                            console.log(`[DEBUG_LOG] After setting, technologies value is: ${input.value}`);
+                          } else if (fieldName.includes('Date') && item[fieldName]) {
+                            // Format date as YYYY-MM-DD for input[type="date"]
+                            const date = new Date(item[fieldName]);
+                            const year = date.getFullYear();
+                            const month = String(date.getMonth() + 1).padStart(2, '0');
+                            const day = String(date.getDate()).padStart(2, '0');
+                            const formattedDate = `${year}-${month}-${day}`;
+                            console.log(`[DEBUG_LOG] Setting date value: ${formattedDate}`);
+                            input.value = formattedDate;
+                            console.log(`[DEBUG_LOG] After setting, date value is: ${input.value}`);
+                          } else if (input.tagName === 'TEXTAREA') {
+                            console.log(`[DEBUG_LOG] Setting textarea value using multiple methods`);
+                            // Try multiple approaches to set textarea value
+                            console.log(`[DEBUG_LOG] Before setting: defaultValue=${input.defaultValue}, value=${input.value}, innerHTML=${input.innerHTML}`);
 
-                          if (item[fieldName] !== undefined) {
-                            console.log(`[DEBUG_LOG] Setting value for field ${fieldName} to ${JSON.stringify(item[fieldName])}`);
+                            input.defaultValue = item[fieldName];
+                            console.log(`[DEBUG_LOG] After setting defaultValue: ${input.defaultValue}`);
 
-                            // Handle special cases
-                            if (fieldName === 'achievements' && Array.isArray(item[fieldName])) {
-                              const value = item[fieldName].join('\n');
-                              console.log(`[DEBUG_LOG] Setting achievements value: ${value}`);
-                              input.value = value;
-                              console.log(`[DEBUG_LOG] After setting, achievements value is: ${input.value}`);
-                            } else if (fieldName === 'technologies' && Array.isArray(item[fieldName])) {
-                              const value = item[fieldName].join(', ');
-                              console.log(`[DEBUG_LOG] Setting technologies value: ${value}`);
-                              input.value = value;
-                              console.log(`[DEBUG_LOG] After setting, technologies value is: ${input.value}`);
-                            } else if (fieldName.includes('Date') && item[fieldName]) {
-                              // Format date as YYYY-MM-DD for input[type="date"]
-                              const date = new Date(item[fieldName]);
-                              const year = date.getFullYear();
-                              const month = String(date.getMonth() + 1).padStart(2, '0');
-                              const day = String(date.getDate()).padStart(2, '0');
-                              const formattedDate = `${year}-${month}-${day}`;
-                              console.log(`[DEBUG_LOG] Setting date value: ${formattedDate}`);
-                              input.value = formattedDate;
-                              console.log(`[DEBUG_LOG] After setting, date value is: ${input.value}`);
-                            } else if (input.tagName === 'TEXTAREA') {
-                              console.log(`[DEBUG_LOG] Setting textarea value using multiple methods`);
-                              // Try multiple approaches to set textarea value
-                              console.log(`[DEBUG_LOG] Before setting: defaultValue=${input.defaultValue}, value=${input.value}, innerHTML=${input.innerHTML}`);
+                            input.value = item[fieldName];
+                            console.log(`[DEBUG_LOG] After setting value: ${input.value}`);
 
-                              input.defaultValue = item[fieldName];
-                              console.log(`[DEBUG_LOG] After setting defaultValue: ${input.defaultValue}`);
+                            input.innerHTML = item[fieldName];
+                            console.log(`[DEBUG_LOG] After setting innerHTML: ${input.innerHTML}`);
 
-                              input.value = item[fieldName];
-                              console.log(`[DEBUG_LOG] After setting value: ${input.value}`);
+                            input.innerText = item[fieldName];
+                            console.log(`[DEBUG_LOG] After setting innerText: ${input.innerText}`);
 
-                              input.innerHTML = item[fieldName];
-                              console.log(`[DEBUG_LOG] After setting innerHTML: ${input.innerHTML}`);
+                            // Force a change event to ensure the value is set
+                            const event = new Event('change', { bubbles: true });
+                            input.dispatchEvent(event);
+                            console.log(`[DEBUG_LOG] Dispatched change event`);
 
-                              input.innerText = item[fieldName];
-                              console.log(`[DEBUG_LOG] After setting innerText: ${input.innerText}`);
-
-                              // Force a change event to ensure the value is set
-                              const event = new Event('change', { bubbles: true });
-                              input.dispatchEvent(event);
-                              console.log(`[DEBUG_LOG] Dispatched change event`);
-
-                              // Final check
-                              console.log(`[DEBUG_LOG] Final textarea state: defaultValue=${input.defaultValue}, value=${input.value}, innerHTML=${input.innerHTML}`);
-                            } else {
-                              console.log(`[DEBUG_LOG] Setting regular input value: ${item[fieldName]}`);
-                              input.value = item[fieldName];
-                              console.log(`[DEBUG_LOG] After setting, input value is: ${input.value}`);
-                            }
-
-                            // Verify the value was set correctly
-                            if (input.value !== item[fieldName] && 
-                                !(Array.isArray(item[fieldName])) && 
-                                !(fieldName.includes('Date'))) {
-                              console.warn(`[DEBUG_LOG] WARNING: Value mismatch after setting. Expected: ${item[fieldName]}, Actual: ${input.value}`);
-                            }
+                            // Final check
+                            console.log(`[DEBUG_LOG] Final textarea state: defaultValue=${input.defaultValue}, value=${input.value}, innerHTML=${input.innerHTML}`);
                           } else {
-                            console.log(`[DEBUG_LOG] Field ${fieldName} not found in item data`);
+                            console.log(`[DEBUG_LOG] Setting regular input value: ${item[fieldName]}`);
+                            input.value = item[fieldName];
+                            console.log(`[DEBUG_LOG] After setting, input value is: ${input.value}`);
                           }
-                        } catch (error) {
-                          console.error(`[DEBUG_LOG] ERROR processing field: ${error.message}`, error);
+
+                          // Verify the value was set correctly
+                          if (input.value !== item[fieldName] && 
+                              !(Array.isArray(item[fieldName])) && 
+                              !(fieldName.includes('Date'))) {
+                            console.warn(`[DEBUG_LOG] WARNING: Value mismatch after setting. Expected: ${item[fieldName]}, Actual: ${input.value}`);
+                          }
+                        } else {
+                          console.log(`[DEBUG_LOG] Field ${fieldName} not found in item data`);
                         }
-                      });
-                    } else {
-                      console.error(`[DEBUG_LOG] ERROR: Item index ${itemIndex} is out of bounds (only ${itemElements.length} elements available)`);
-                    }
-                  });
-                }, 100); // 100ms delay
+                      } catch (error) {
+                        console.error(`[DEBUG_LOG] ERROR processing field: ${error.message}`, error);
+                      }
+                    });
+                  } else {
+                    console.error(`[DEBUG_LOG] ERROR: Item index ${itemIndex} is out of bounds (only ${itemElements.length} elements available)`);
+                  }
+                });
               }
 
               // If this is a custom section, initialize the Quill editor with the content
               if (section.type === 'custom' && section.items && section.items[0] && section.items[0].content) {
-                const editorId = `editor-${sectionIndex - 1}`;
-                const contentId = `content-${sectionIndex - 1}`;
+                const editorId = `editor-${sectionIndex}`;
+                const contentId = `content-${sectionIndex}`;
 
-                setTimeout(() => {
-                  const contentInput = document.getElementById(contentId);
-                  if (contentInput) {
-                    contentInput.value = section.items[0].content;
+                const contentInput = document.getElementById(contentId);
+                if (contentInput) {
+                  contentInput.value = section.items[0].content;
 
-                    // If Quill is initialized, set its content
-                    const editorIndex = sectionIndex - 1;
-                    if (quillEditors[editorIndex]) {
-                      quillEditors[editorIndex].root.innerHTML = section.items[0].content;
-                    }
+                  // If Quill is initialized, set its content
+                  if (quillEditors[sectionIndex]) {
+                    quillEditors[sectionIndex].root.innerHTML = section.items[0].content;
                   }
-                }, 100);
+                }
               }
-            }
-          });
+            });
+          }, 300); // Increased delay to ensure all DOM elements are fully rendered
 
           // If we're in a multi-page layout, set the page selectors for each section
           if (portfolio.layout && !portfolio.layout.singlePage && portfolio.layout.pages) {
@@ -878,6 +894,9 @@
       return;
     }
 
+    // Declare div outside the try block so it's available throughout the function
+    let div;
+
     try {
       console.log(`[DEBUG_LOG] Cloning template for ${type}...`);
       const clone = document.importNode(template.content, true);
@@ -892,7 +911,7 @@
       console.log(`[DEBUG_LOG] Replacing {index} placeholders with ${sectionIndex}`);
       const html = tempDiv.innerHTML.replace(/{index}/g, sectionIndex);
 
-      const div = document.createElement('div');
+      div = document.createElement('div');
       div.innerHTML = html;
       div.id = `section-${sectionIndex}`;
       div.dataset.type = type;
@@ -912,6 +931,13 @@
       }
     } catch (error) {
       console.error(`[DEBUG_LOG] ERROR in addSection: ${error.message}`, error);
+      return; // Exit the function if an error occurs
+    }
+
+    // Only proceed if div was successfully created
+    if (!div) {
+      console.error(`[DEBUG_LOG] ERROR: div was not created successfully`);
+      return;
     }
 
     // Fix the onclick attribute of the "Add Another Entry" button
