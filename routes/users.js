@@ -82,8 +82,9 @@ router.post('/login', async (req, res) => {
   let match = {};
   try {
     match = await users.checkUser(username, password);  //checkUser throws error if passwords don't match
-    req.session.user = {
+    req.session.user = {  // setting session.user to indicate that the user is logged in
       username: user.username,
+      email: user.email,
       userId: user._id.toString()
     }
     res.redirect('/users/profile');
@@ -97,7 +98,8 @@ router.post('/login', async (req, res) => {
 
 router.get('/logout', async (req, res) => { // need to add /users/logout link for template of any page where a user is logged in
   req.session.destroy();
-  res.send('Logged out');
+  //res.send('Logged out');
+  res.redirect('/');
 });
 
 router.get('/profile', async (req, res) => {
