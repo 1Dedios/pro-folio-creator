@@ -8,12 +8,18 @@
 </head>
 
 <body>
-    <header>
-        <nav>
+    <header class="common-header">
+        <div class="header-left">
+            <a href="/"><img src="/public/images/ProFolio-Logo.png" alt="Logo" class="nav-logo"></a>
+        </div>
+        <nav class="header-nav">
             <ul>
-                <li><a href="/">Home</a></li>
                 {{#if user}}
                 <li><a href="/users/profile">Profile</a></li>
+                <li><a href="/users/logout">Log Out</a></li>
+                {{else}}
+                <li><a href="/users/signup">Sign Up</a></li>
+                <li><a href="/users/login">Log In</a></li>
                 {{/if}}
             </ul>
         </nav>
