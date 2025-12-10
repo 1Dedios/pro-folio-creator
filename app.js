@@ -20,7 +20,29 @@ app.engine('handlebars', engine({
     formatDate: handlebarsHelpers.formatDate,
     eq: handlebarsHelpers.eq,
     sortBy: handlebarsHelpers.sortBy,
-    ifEquals: handlebarsHelpers.ifEquals
+    ifEquals: handlebarsHelpers.ifEquals,
+    toString: function(value) {
+      return value ? value.toString() : '';
+    },
+    default: function(value, defaultValue) {
+      return value || defaultValue;
+    },
+    sectionInPage: function(section, pageIndex, pages) {
+      if (!pages || !pages[pageIndex] || !pages[pageIndex].sectionIds) {
+        return false;
+      }
+
+      const pageSectionIds = pages[pageIndex].sectionIds.map(id => id.toString());
+      return pageSectionIds.includes(section._id.toString());
+    },
+    or: function() {
+      for (let i = 0; i < arguments.length - 1; i++) {
+        if (arguments[i]) {
+          return arguments[i];
+        }
+      }
+      return false;
+    }
   }
 }));
 app.set('view engine', 'handlebars');
