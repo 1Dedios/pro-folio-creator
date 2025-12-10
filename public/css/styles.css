@@ -31,23 +31,26 @@ header {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-header nav {
+.common-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: .5rem 1rem;
+  width: 100%;
+}
+
+/*header nav {
+  max-width: 1200px;
   max-width: 1200px;
   margin: 0 auto;
+  margin: 0 auto;
   padding: 0 1rem;
-}
+  padding: 0 1rem;
+}*/
 
-header ul {
-  list-style: none;
-  display: flex;
-  gap: 1.5rem;
-}
-
-header a {
-  color: var(--white);
-  text-decoration: none;
-  font-weight: 500;
-  transition: color 0.2s ease;
+.nav-logo {
+  height: 50px;
+  width: auto;
 }
 
 header a:hover {
