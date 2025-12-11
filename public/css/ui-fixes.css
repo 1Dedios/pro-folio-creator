@@ -1,0 +1,95 @@
+/* ======= UI fixes for portfolio grid + buttons ======= */
+/* Scoped to portfolios to reduce interference */
+.portfolios .grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  align-items: start;
+}
+
+/* Card visuals */
+.portfolios .card,
+.portfolio-card {
+  background: var(--white);
+  border-radius: 10px;
+  padding: 14px;
+  border: 1px solid rgba(15,23,42,0.04);
+  box-shadow: 0 8px 20px rgba(10,10,20,0.04);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header and metadata spacing */
+.portfolios .card header { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:8px; }
+.portfolios .card .desc { margin: 8px 0; color: var(--dark-gray); }
+.portfolios .card .meta { font-size: 13px; color: var(--dark-gray); }
+
+/* Buttons — unify anchor.btn and button.btn look */
+.btn,
+a.btn,
+button.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(15,23,42,0.06);
+  background: transparent;
+  color: var(--primary-color);
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none; /* remove underline for anchor.btn */
+  line-height: 1;
+}
+
+/* Ensure anchor buttons don't show browser-blue color */
+a.btn { color: inherit; }
+
+/* Primary (Set active) */
+.btn.primary,
+button.js-set-active-btn,
+.btn.js-set-active-btn {
+  background: var(--primary-color);
+  color: #fff;
+  border-color: transparent;
+}
+
+/* Activated (disabled-looking) */
+button.activated,
+.btn.activated {
+  background: linear-gradient(90deg, var(--primary-color), #1a56db);
+  color: #fff;
+  border-color: transparent;
+}
+
+/* Delete button styling */
+.btn.btn-delete,
+button.btn-delete {
+  background: transparent;
+  color: var(--error);
+  border: 1px solid rgba(239,68,68,0.12);
+}
+
+/* Edit link styled as button */
+a.btn[href$="/edit"] {
+  background: transparent;
+  color: var(--accent-color);
+  border: 1px solid rgba(15,23,42,0.06);
+}
+
+/* Card actions row */
+.portfolio-actions,
+.card-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+/* Small screens: stack */
+@media (max-width: 560px) {
+  .portfolios .grid { grid-template-columns: 1fr; }
+  .portfolio-actions { flex-direction: column; align-items: stretch; }
+  .btn { justify-content: center; width: 100%; }
+  a.btn { display: block; }
+}
