@@ -22,7 +22,9 @@ router
     }
   })
   .post(async (req, res) => {
+    console.log("ON THE SERVER");
     const { senderName, senderEmail, message } = req.body;
+    console.log(senderName, senderEmail, message);
     const validationErrors = {};
     let validatedName;
     let validatedEmail;
@@ -31,23 +33,24 @@ router
     // xss mitigation
     let fieldsArr = [senderName, senderEmail, message];
     fieldsArr = escapeHTML(fieldsArr);
+    console.log("ON THE SERVER");
 
     try {
       validatedName = validateString(fieldsArr[0]);
     } catch (e) {
-      validationErrors.name = e.message;
+      validationErrors.name = e;
     }
 
     try {
       validatedEmail = validateEmail(fieldsArr[1]);
     } catch (e) {
-      validationErrors.email = e.message;
+      validationErrors.email = e;
     }
 
     try {
       validatedMessage = validateString(fieldsArr[2]);
     } catch (e) {
-      validationErrors.message = e.message;
+      validationErrors.message = e;
     }
 
     if (Object.keys(validationErrors).length > 0) {
@@ -71,8 +74,8 @@ router
           validatedMessage
         );
       } catch (e) {
-        console.warn(e.message);
-        return res.status(500).json({ error: e.message });
+        console.warn(e);
+        return res.status(500).json({ error: e });
       }
 
       await sendEmail(
@@ -88,8 +91,9 @@ router
         delay: 3000,
       });
     } catch (e) {
-      console.warn(e.message);
-      return res.status(500).json({ error: e.message });
+      console.log("SERVER ERROR");
+      console.warn(e);
+      return res.status(500).json({ error: e });
     }
   });
 
