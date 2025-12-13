@@ -35,11 +35,7 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-<<<<<<< HEAD
-  padding: .5rem 1rem;
-=======
   padding: 0.5rem 1rem;
->>>>>>> main
   width: 100%;
 }
 
@@ -212,12 +208,8 @@ main {
   margin-top: 1rem;
 }
 
-<<<<<<< HEAD
-.btn-edit, .btn-copy {
-=======
 .btn-edit,
 .btn-copy {
->>>>>>> main
   display: inline-block;
   padding: 0.5rem 1rem;
   border-radius: 0.375rem;
@@ -330,13 +322,10 @@ main {
   color: red;
 }
 
-<<<<<<< HEAD
-=======
 .form-client-error {
   color: red;
 }
 
->>>>>>> main
 /* Page Names Section */
 #pageNamesSection {
   margin: 1.5rem 0;
