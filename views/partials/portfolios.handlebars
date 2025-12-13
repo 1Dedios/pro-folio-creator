@@ -1,4 +1,4 @@
-<section class="portfolios">
+<section class="section-items">
     <h2>Your portfolios</h2>
 
     {{#if portfolios.length}}
@@ -38,6 +38,9 @@
                     <input type="hidden" name="userId" value="{{../user._id}}">
                     <button type="submit" class="btn btn-delete">Delete</button>
                 </form>
+
+                <!-- edit button (goes to /portfolio/:id/edit) -->
+                <a class="btn" href="/portfolio/{{this._id}}/edit">Edit</a>
             </div>
         </article>
         {{/each}}

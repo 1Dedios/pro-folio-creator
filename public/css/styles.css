@@ -31,23 +31,26 @@ header {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-header nav {
+.common-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: .5rem 1rem;
+  width: 100%;
+}
+
+/*header nav {
+  max-width: 1200px;
   max-width: 1200px;
   margin: 0 auto;
+  margin: 0 auto;
   padding: 0 1rem;
-}
+  padding: 0 1rem;
+}*/
 
-header ul {
-  list-style: none;
-  display: flex;
-  gap: 1.5rem;
-}
-
-header a {
-  color: var(--white);
-  text-decoration: none;
-  font-weight: 500;
-  transition: color 0.2s ease;
+.nav-logo {
+  height: 50px;
+  width: auto;
 }
 
 header a:hover {
@@ -144,9 +147,98 @@ main {
   margin: 0 auto;
 }
 
+/* Portfolio Navigation */
+.portfolio-navigation {
+  margin: 1.5rem 0;
+}
+
+.page-tabs {
+  display: flex;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border-bottom: 1px solid var(--light-gray);
+  overflow-x: auto;
+}
+
+.page-tab {
+  padding: 0.75rem 1.25rem;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-bottom: none;
+  margin-right: 0.25rem;
+  border-top-left-radius: 0.375rem;
+  border-top-right-radius: 0.375rem;
+  background-color: var(--light-gray);
+  transition: all 0.2s ease;
+}
+
+.page-tab:hover {
+  background-color: var(--white);
+}
+
+.page-tab.active {
+  background-color: var(--white);
+  border-color: var(--light-gray);
+  border-bottom-color: var(--white);
+  margin-bottom: -1px;
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.page-tab a {
+  color: var(--text-color);
+  text-decoration: none;
+  display: block;
+}
+
+.page-tab.active a {
+  color: var(--primary-color);
+}
+
 .portfolio-header {
   text-align: center;
   margin-bottom: 2rem;
+}
+
+.portfolio-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.btn-edit, .btn-copy {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.btn-edit {
+  background-color: var(--primary-color);
+  color: var(--white);
+  border: 1px solid var(--primary-color);
+}
+
+.btn-edit:hover {
+  background-color: #2563eb;
+  text-decoration: none;
+}
+
+.btn-copy {
+  background-color: var(--white);
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+}
+
+.btn-copy:hover {
+  background-color: #eff6ff;
+  text-decoration: none;
 }
 
 .portfolio-section {
@@ -227,6 +319,40 @@ main {
 
 .form-group span {
   color: red;
+}
+
+/* Page Names Section */
+#pageNamesSection {
+  margin: 1.5rem 0;
+  padding: 1.5rem;
+  background-color: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+}
+
+#pageNamesSection h3 {
+  margin-top: 0;
+  color: #3b82f6;
+}
+
+.page-name-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.page-name-container input {
+  flex-grow: 1;
+}
+
+.delete-page {
+  padding: 0.3rem 0.5rem;
+  font-size: 0.75rem;
+}
+
+/* Page Selector */
+.page-selector {
+  margin-right: 10px;
 }
 
 /* User Profile Page */
@@ -313,12 +439,10 @@ main {
   }
 }
 
-/*Home Page*/
+/*Home Page Buttons */
 .home-buttons {
   display: flex;
-  align-items: center;
   justify-content: center;
-  gap: 1.5rem;
   margin-top: 2rem;
 }
 
@@ -326,9 +450,9 @@ main {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.75rem 1.3rem;
+  padding: 0.85rem 1.6rem;
   text-decoration: none;
-  background: #10155e; /* original navy */
+  background: #10155e; 
   color: white;
   border-radius: 8px;
   font-weight: 600;
@@ -337,25 +461,18 @@ main {
 }
 
 .home-buttons a:hover {
-  transform: translateY(-3px);
+  transform: translateY(-2px);
   background-color: #1a227a;
 }
 
-.divider {
-  width: 3px;
-  height: 45px;
-  background-color: #0c0f3b;
-  border-radius: 2px;
-}
-
+/*Feature list details*/
 .features {
   margin-top: 4rem;
   padding: 2rem 1.5rem;
-  max-width: 700px;           /* keeps content readable */
-  margin-left: 0;             /* hugs left side */
+  max-width: 700px;           
+  margin-left: 0;             
 }
 
-/* Title */
 .features h2 {
   text-align: left;
   font-size: 1.9rem;
@@ -363,17 +480,15 @@ main {
   color: #0c0f3b;
 }
 
-/* List layout */
 .features ul {
   list-style: none;
   padding: 0;
   margin: 0;
   display: flex;
-  flex-direction: column;     /* vertical list */
-  gap: 1.1rem;                /* spacing between items */
+  flex-direction: column;     
+  gap: 1.1rem;                
 }
 
-/* Each feature line */
 .features li {
   display: flex;
   align-items: flex-start;
@@ -384,14 +499,15 @@ main {
   font-weight: 500;
 }
 
-/* Bullet icon */
+
 .features li::before {
   content: "✓";
-  color: #1f3aff;             /* subtle navy-blue check */
+  color: #1f3aff;             
   margin-right: 0.8rem;
   font-weight: bold;
 }
 
+/* Top Page details */
 .homepage-title {
   text-align: center;
   margin-top: 1.5rem;
@@ -403,24 +519,60 @@ main {
   margin-bottom: 1.5rem;
 }
 
+/* Example Portfolios details */
 .example-portfolios {
-  margin-top: 3rem; /* space from buttons */
-  max-width: 900px; 
-  margin-left: 0;     /* align to the left */
-  margin-right: auto; /* keep width restriction */
-  padding: 0 1.5rem;  /* optional horizontal padding */
+  margin-top: 3rem;
+  max-width: 700px;      
+  padding: 2rem 1.5rem;  
+  margin-left: 0;        
 }
 
 .example-portfolios h2 {
-  text-align: left;  /* aligns the heading with the left edge */
+  text-align: left;
+  font-size: 1.9rem;      
+  margin-bottom: 1.5rem;  
+  color: #0c0f3b;         
 }
 
 .example-portfolios ul {
   list-style: none;
-  padding-left: 0;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;            
 }
 
 .example-portfolios li {
-  padding: 0.5rem 0;
-  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+  color: #0c0f3b;
+  font-weight: 500;
+}
+
+
+.example-portfolios a {
+  text-decoration: none;
+  color: #1f3aff;         
+}
+
+.example-portfolios a:hover {
+  text-decoration: underline;
+}
+
+/* Footer details */
+.site-footer {
+  margin-top: 6rem;
+  padding: 2rem 0;
+  text-align: center;
+}
+
+.footer-link {
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.05rem;
+  color: #0c0f3b;
+}
+
+.footer-link:hover {
+  text-decoration: underline;
 }

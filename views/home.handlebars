@@ -2,33 +2,29 @@
 <p class="homepage-subtitle">Begin creating your personal portfolio quickly and intuitively.</p>
 
 <div class="home-buttons">
-    <a href="/create" class="button-create">Create Portfolio</a>
-    <span class="divider"></span>
-    <a href="/users/signup" class="button-signup">Sign Up</a>
-    <span class="divider"></span>
-    <a href="/users/login" class="button-login">Log In</a>
+    <a href="/create" class="button-create">Create Portfolio!</a>
 </div>
 
 <section class="features">
     <h2>Features</h2>
     <ul>
-        <li>Pre-formatted sections</li>
-        <li>Theme customization system</li>
-        <li>Super flexible page layouts</li>
-        <li>User profile and portfolio dashboard</li>
+        <li>Pre-formatted sections to structure your portfolio quickly.</li>
+        <li>Theme system allowing users to personalize their portfolios.</li>
+        <li>Super flexible page layouts for arranging important content.</li>
+        <li>User profile and portfolio dashboard to manage your projects.</li>
     </ul>
 </section>
 
 <section class="example-portfolios">
     <h2>Example Portfolios</h2>
     {{#if examples}}
-        <ul>
+    <ul>
         {{#each examples}}
-            <li><a href ="/portfolio/{{this._id}}">{{this.title}}</a></li>
+        <li><a href="/portfolio/{{this._id}}">{{this.title}}</a></li>
         {{/each}}
-        </ul>
+    </ul>
     {{else}}
-        <p>No examples exist!</p>
+    <p>No examples exist!</p>
     {{/if}}
 </section>
 
