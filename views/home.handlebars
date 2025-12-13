@@ -3,8 +3,27 @@
 
 <div class="home-buttons">
     <a href="/create" class="button-create">Create Portfolio!</a>
+<<<<<<< HEAD
 </div>
 
+=======
+    <a href="/portfolios/examples" class="button-examples">View Some Examples</a>
+</div>
+
+<section class="example-portfolios">
+    <h2>Example Portfolios</h2>
+    {{#if examples}}
+    <ul>
+        {{#each examples}}
+        <li><a href="/portfolio/{{this._id}}">{{this.title}}</a></li>
+        {{/each}}
+    </ul>
+    {{else}}
+    <p>No examples exist!</p>
+    {{/if}}
+</section>
+
+>>>>>>> main
 <section class="features">
     <h2>Features</h2>
     <ul>
