@@ -4,6 +4,7 @@
 <form action="/users/login" method="POST" class="login-form">
   <label>
     Username:
+<<<<<<< Updated upstream
     <input type="text" id="username" name="username" required>
   </label>
   <label>
@@ -13,3 +14,29 @@
   <button type="submit">Login</button>
 </form>
 <br>
+=======
+    <input
+      type="text"
+      id="loginUsername"
+      name="loginUsername"
+      minlength="3"
+      pattern="\w{3,16}"
+      required
+      autofocus
+    >
+  </label>
+  <label>
+    Password:
+    <input
+      type="password"
+      id="loginPassword"
+      name="loginPassword"
+      minlength="8"
+      pattern="[A-Za-z\d@$!%*?&]{8,}"
+      required
+    >
+  </label>
+  <button type="submit">Login</button>
+</form>
+<br>
+>>>>>>> Stashed changes

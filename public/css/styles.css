@@ -438,3 +438,8 @@ main {
     grid-template-columns: 1fr;
   }
 }
+
+.error-message {
+    color: #EF4444;
+    margin-bottom: 1.5rem;
+  }

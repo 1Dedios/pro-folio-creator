@@ -4,6 +4,7 @@
 <form action="/users/signup" method="POST" class="signup-form">
   <label>
     Username:
+<<<<<<< Updated upstream
     <input type="text" id="username" name="username" required>
   </label>
   <label>
@@ -17,3 +18,40 @@
   <button type="submit">Sign Up</button>
 </form>
 <br>
+=======
+    <input
+      type="text"
+      id="signupUsername"
+      name="signupUsername"
+      minlength="3"
+      maxlength="16"
+      pattern="\w{3,16}"
+      required
+      autofocus
+    >
+  </label>
+  <label>
+    Email:
+    <input
+      type="email"
+      id="signupEmail"
+      name="signupEmail"
+      maxlength="254"
+      required
+    >
+  </label>
+  <label>
+    Password:
+    <input
+      type="password"
+      id="signupPassword"
+      name="signupPassword"
+      minlength="8"
+      pattern="[A-Za-z\d@$!%*?&]{8,}"
+      required
+    >
+  </label>
+  <button type="submit">Sign Up</button>
+</form>
+<br>
+>>>>>>> Stashed changes
