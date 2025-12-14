@@ -35,7 +35,7 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: .5rem 1rem;
+  padding: 0.5rem 1rem;
   width: 100%;
 }
 
@@ -348,6 +348,10 @@ main {
   color: red;
 }
 
+.form-client-error {
+  color: red;
+}
+
 /* Page Names Section */
 #pageNamesSection {
   margin: 1.5rem 0;
@@ -562,4 +566,142 @@ main {
   .theme-selection {
     grid-template-columns: 1fr;
   }
+}
+
+/*Home Page Buttons */
+.home-buttons {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.home-buttons a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.85rem 1.6rem;
+  text-decoration: none;
+  background: #10155e;
+  color: white;
+  border-radius: 8px;
+  font-weight: 600;
+  border: 2px solid #10155e;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.home-buttons a:hover {
+  transform: translateY(-2px);
+  background-color: #1a227a;
+}
+
+/*Feature list details*/
+.features {
+  margin-top: 4rem;
+  padding: 2rem 1.5rem;
+  max-width: 700px;
+  margin-left: 0;
+}
+
+.features h2 {
+  text-align: left;
+  font-size: 1.9rem;
+  margin-bottom: 1.5rem;
+  color: #0c0f3b;
+}
+
+.features ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.features li {
+  display: flex;
+  align-items: flex-start;
+  font-size: 1.1rem;
+  color: #0c0f3b;
+  padding-left: 0.3rem;
+  line-height: 1.45;
+  font-weight: 500;
+}
+
+
+.features li::before {
+  content: "✓";
+  color: #1f3aff;
+  margin-right: 0.8rem;
+  font-weight: bold;
+}
+
+/* Top Page details */
+.homepage-title {
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+.homepage-subtitle {
+  text-align: center;
+  font-size: 1.2rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Example Portfolios details */
+.example-portfolios {
+  margin-top: 3rem;
+  max-width: 700px;
+  padding: 2rem 1.5rem;
+  margin-left: 0;
+}
+
+.example-portfolios h2 {
+  text-align: left;
+  font-size: 1.9rem;
+  margin-bottom: 1.5rem;
+  color: #0c0f3b;
+}
+
+.example-portfolios ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.example-portfolios li {
+  font-size: 1.1rem;
+  color: #0c0f3b;
+  font-weight: 500;
+}
+
+
+.example-portfolios a {
+  text-decoration: none;
+  color: #1f3aff;
+}
+
+.example-portfolios a:hover {
+  text-decoration: underline;
+}
+
+/* Footer details */
+.site-footer {
+  margin-top: 6rem;
+  padding: 2rem 0;
+  text-align: center;
+}
+
+.footer-link {
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.05rem;
+  color: #0c0f3b;
+}
+
+.footer-link:hover {
+  text-decoration: underline;
 }
