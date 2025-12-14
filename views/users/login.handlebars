@@ -1,7 +1,7 @@
 <h1>Log In</h1>
-<p>Fill out the form below to Log In</p>
+<p id="loginDescription">Fill out the form below to Log In</p>
 
-<form action="/users/login" method="POST" class="login-form">
+<form action="/users/login" method="POST" class="login-form" id="login-form">
   <label>
     Username:
     <input
@@ -12,7 +12,7 @@
       pattern="\w{3,16}"
       required
       autofocus
-    >
+    />
   </label>
   <label>
     Password:
@@ -23,8 +23,8 @@
       minlength="8"
       pattern="[A-Za-z\d@$!%*?&]{8,}"
       required
-    >
+    />
   </label>
   <button type="submit">Login</button>
 </form>
-<br>
+<br />

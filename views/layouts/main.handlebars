@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8">
+    <meta charset="utf-8" />
     <title>{{title}}</title>
     <link rel="stylesheet" href="/public/css/styles.css">
     <link rel="stylesheet" href="/public/css/ui-fixes.css">
+    <!-- Vanilla Colorful color picker (locally installed) -->
+    <script type="module" src="/node_modules/vanilla-colorful/hex-color-picker.js"></script>
 </head>
 
-<body>
+  <body>
     <header class="common-header">
       <div class="header-left">
         <a href="/"
@@ -15,7 +17,7 @@
             src="/public/images/ProFolio-Logo.png"
             alt="Logo"
             class="nav-logo"
-        ></a>
+        /></a>
       </div>
       <nav class="header-nav">
         <ul>
@@ -30,22 +32,22 @@
       </nav>
     </header>
 
-    <main>
-        {{{body}}}
-    </main>
+    <main>{{{body}}}</main>
 
-    <footer>ProFolio</footer>
+    <footer class="site-footer">
+        <a href="/" class ="footer-link">ProFolio</a>
+    </footer>
 
-    <script type="module" src="/public/js/formValidation.js"></script>
+    <script type="module" src="/public/js/formValidation.js" defer></script>
     <script>
-        // If server passed userJson it will be an object literal here; else use null
-        window.__APP_USER = {{#if userJson}}{{{ userJson }}}{{else}}null{{/if}};
-        window.__APP_ACTIVE = window.__APP_USER && window.__APP_USER.activePortfolioId ? window.__APP_USER.activePortfolioId : null;
-        // console.log('APP_USER:', window.__APP_USER, 'APP_ACTIVE:', window.__APP_ACTIVE);
+      // If server passed userJson it will be an object literal here; else use null
+      window.__APP_USER = {{#if userJson}}{{{ userJson }}}{{else}}null{{/if}};
+      window.__APP_ACTIVE = window.__APP_USER && window.__APP_USER.activePortfolioId ? window.__APP_USER.activePortfolioId : null;
+      // console.log('APP_USER:', window.__APP_USER, 'APP_ACTIVE:', window.__APP_ACTIVE);
     </script>
 
-    <script type="module" src="/public/js/portfolios.js"></script>
-    <script type="module" src="/public/js/themes.js"></script>
+    <script type="module" src="/public/js/portfolios.js" defer></script>
+    <script type="module" src="/public/js/themes.js" defer></script>
 
 
 </body>

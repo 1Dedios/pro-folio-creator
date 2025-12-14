@@ -10,10 +10,24 @@ const apiRouter = express.Router();
 // Theme routes
 apiRouter.get("/themes", async (req, res) => {
   try {
-    const allThemes = await themes.getAllThemes();
+    // Check if user is logged in
+    const userId = req.session.user ? req.session.user.userId : null;
+
+    // Get all example themes
+    const exampleThemes = await themes.getExampleThemes();
+
+    // Get user's themes if logged in
+    let userThemes = [];
+    if (userId) {
+        userThemes = await themes.getAllThemes(userId);
+    }
+
+    // Combine and return all themes
+    const allThemes = [...exampleThemes, ...userThemes];
     res.json(allThemes);
   } catch (e) {
-    res.status(500).json({ error: e });
+    console.error('Error getting themes:', e);
+    res.status(500).json({ error: 'Failed to get themes' });
   }
 });
 
@@ -33,6 +47,41 @@ apiRouter.get("/themes/:id", async (req, res) => {
   } catch (e) {
     //res.status(404).json({ error: e });
     return res.status(404).render('error', {title: 'Page Not Found', error: 'Page Not Found'});
+  }
+});
+
+// Create a new theme
+apiRouter.post("/themes", async (req, res) => {
+  try {
+    // Check if user is logged in
+    if (!req.session.user) {
+      return res.status(401).json({ error: 'You must be logged in to create a theme' });
+    }
+
+    const userId = req.session.user.userId;
+    const { name, themeData } = req.body;
+
+    // Validate input
+    if (!name || !themeData) {
+      return res.status(400).json({ error: 'Name and theme data are required' });
+    }
+
+    if (!themeData.backgroundColor || !themeData.sectionColor || !themeData.textColor) {
+      return res.status(400).json({ error: 'Theme data must include backgroundColor, sectionColor, and textColor' });
+    }
+
+    // Create the theme
+    const newTheme = await themes.createTheme(
+      userId,
+      name,
+      themeData,
+      false // Not an example theme
+    );
+
+    res.status(201).json(newTheme);
+  } catch (e) {
+    console.error('Error creating theme:', e);
+    res.status(500).json({ error: 'Failed to create theme' });
   }
 });
 

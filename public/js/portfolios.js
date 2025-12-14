@@ -1,6 +1,33 @@
 // Handles AJAX activate/delete actions and updates DOM in-place.
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Handle "Copy Link to Active Portfolio" button
+  const copyLinkBtn = document.getElementById('copyActivePortfolioLink');
+  if (copyLinkBtn && window.__APP_USER) {
+    copyLinkBtn.addEventListener('click', () => {
+      const userId = window.__APP_USER._id;
+      const baseUrl = window.location.origin;
+      const portfolioUrl = `${baseUrl}/user/${userId}/portfolio`;
+
+      // Copy to clipboard
+      navigator.clipboard.writeText(portfolioUrl)
+        .then(() => {
+          // Provide feedback to the user
+          const originalText = copyLinkBtn.textContent;
+          copyLinkBtn.textContent = 'Copied!';
+
+          // Reset button text after 2 seconds
+          setTimeout(() => {
+            copyLinkBtn.textContent = originalText;
+          }, 2000);
+        })
+        .catch(err => {
+          console.error('Failed to copy: ', err);
+          alert('Failed to copy link to clipboard');
+        });
+    });
+  }
+
   // Helper: find card element for portfolioId
   const findCard = (portfolioId) =>
     document.querySelector(`article.card[data-portfolio-id="${portfolioId}"]`);

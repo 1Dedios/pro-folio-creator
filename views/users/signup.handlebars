@@ -1,7 +1,7 @@
 <h1>Sign up for a New Account</h1>
-<p>Fill out the form below to create a new account</p>
+<p id="signupDescription">Fill out the form below to create a new account</p>
 
-<form action="/users/signup" method="POST" class="signup-form">
+<form action="/users/signup" method="POST" class="signup-form" id="signup-form">
   <label>
     Username:
     <input
@@ -13,7 +13,7 @@
       pattern="\w{3,16}"
       required
       autofocus
-    >
+    />
   </label>
   <label>
     Email:
@@ -23,7 +23,7 @@
       name="signupEmail"
       maxlength="254"
       required
-    >
+    />
   </label>
   <label>
     Password:
@@ -34,8 +34,8 @@
       minlength="8"
       pattern="[A-Za-z\d@$!%*?&]{8,}"
       required
-    >
+    />
   </label>
   <button type="submit">Sign Up</button>
 </form>
-<br>
+<br />

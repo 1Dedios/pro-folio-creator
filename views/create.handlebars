@@ -14,12 +14,12 @@
 
 <form action="{{#if portfolio}}/portfolio/{{portfolio._id}}/edit{{else}}/create{{/if}}" method="POST" class="portfolio-form">
   <div class="form-group">
-    <label for="title">Title:</label>
+    <label for="title">Title:<span>*</span></label>
     <input type="text" id="title" name="title" value="{{#if portfolio}}{{portfolio.title}}{{else}}{{formData.title}}{{/if}}" required>
   </div>
 
   <div class="form-group">
-    <label for="description">Description:</label>
+    <label for="description">Description:<span>*</span></label>
     <textarea id="description" name="description" rows="3" required>{{#if portfolio}}{{portfolio.description}}{{else}}{{formData.description}}{{/if}}</textarea>
   </div>
 
@@ -51,8 +51,8 @@
     <p>Add up to 8 page names for your multi-page portfolio</p>
     <div id="pageNames-container">
       <div class="form-group">
-        <label for="pageName0">Page 1:</label>
-        <input type="text" id="pageName0" name="pageNames[0]" value="Home" required>
+        <label for="pageName0">Page 1:<span>*</span></label>
+        <input type="text" id="pageName0" name="pageNames[0]" value="Page 1" required>
       </div>
     </div>
     <button type="button" class="btn-secondary" id="addPageBtn" onclick="addPageName()">Add Another Page</button>
@@ -63,6 +63,65 @@
       <input type="checkbox" id="contactButtonEnabled" name="contactButtonEnabled" {{#if portfolio}}{{#if portfolio.contactButtonEnabled}}checked{{/if}}{{else}}{{#if formData.contactButtonEnabled}}checked{{/if}}{{/if}}>
       <span>Enable "Contact Me" button</span>
     </label>
+  </div>
+
+  <h2>Theme</h2>
+  <p>Select a theme for your portfolio or create a new one</p>
+
+  <div class="theme-selection">
+    <div class="form-group">
+      <label for="themeSelector">Select Theme:</label>
+      <select id="themeSelector" name="themeId">
+        <option value="">-- Select a theme --</option>
+        <!-- Themes will be loaded via JavaScript -->
+      </select>
+    </div>
+
+    <div class="theme-preview">
+      <div class="theme-preview-header">Theme Preview</div>
+      <div class="theme-preview-content" id="themePreview">
+        <div class="preview-background">
+          <div class="preview-section">
+            <div class="preview-text">Sample Text</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button type="button" class="btn-secondary" id="createThemeBtn" onclick="toggleCreateThemeForm()">Create New Theme</button>
+  </div>
+
+  <div id="createThemeForm" style="display: none;">
+    <h3>Create New Theme</h3>
+    <div class="form-group">
+      <label for="themeName">Theme Name:</label>
+      <input type="text" id="themeName" name="themeName" placeholder="My Custom Theme">
+    </div>
+
+    <div class="color-pickers">
+      <div class="color-picker-group">
+        <label for="backgroundColor">Background Color:</label>
+        <div id="backgroundColorPicker" class="color-picker"></div>
+        <input type="text" id="backgroundColor" name="backgroundColor" value="#F9FAFB" readonly>
+      </div>
+
+      <div class="color-picker-group">
+        <label for="sectionColor">Section Color:</label>
+        <div id="sectionColorPicker" class="color-picker"></div>
+        <input type="text" id="sectionColor" name="sectionColor" value="#FFFFFF" readonly>
+      </div>
+
+      <div class="color-picker-group">
+        <label for="textColor">Text Color:</label>
+        <div id="textColorPicker" class="color-picker"></div>
+        <input type="text" id="textColor" name="textColor" value="#1F2937" readonly>
+      </div>
+    </div>
+
+    <div class="theme-form-buttons">
+      <button type="button" class="btn-secondary" onclick="saveNewTheme()">Save Theme</button>
+      <button type="button" class="btn-secondary" onclick="toggleCreateThemeForm()">Cancel</button>
+    </div>
   </div>
 
   <button type="submit" class="btn-primary">{{#if portfolio}}Update Portfolio{{else}}Create Portfolio{{/if}}</button>
@@ -76,8 +135,7 @@
       <div class="section-controls">
         <div class="page-selector" style="display: none;">
           <select id="pageSelector{index}" name="sections[{index}][pageSelector]">
-            <option value="all">All Pages</option>
-            <!-- Additional options will be added dynamically -->
+            <!-- Options will be added dynamically -->
           </select>
         </div>
         <button type="button" class="btn-arrow move-up" onclick="moveSection('section-{index}', 'up')" title="Move Up">↑</button>
@@ -88,11 +146,11 @@
     <div class="section-items">
       <div class="section-item">
         <div class="form-group">
-          <label for="institution">Institution:</label>
+          <label for="institution">Institution:<span>*</span></label>
           <input type="text" name="sections[{index}][items][0][institution]" required>
         </div>
         <div class="form-group">
-          <label for="degree">Degree:</label>
+          <label for="degree">Degree:<span>*</span></label>
           <input type="text" name="sections[{index}][items][0][degree]" required>
         </div>
         <div class="form-group">
@@ -129,11 +187,11 @@
       </div>
     </div>
     <div class="form-group">
-      <label for="institution">Institution:</label>
+      <label for="institution">Institution:<span>*</span></label>
       <input type="text" name="sections[{index}][items][{itemIndex}][institution]" required>
     </div>
     <div class="form-group">
-      <label for="degree">Degree:</label>
+      <label for="degree">Degree:<span>*</span></label>
       <input type="text" name="sections[{index}][items][{itemIndex}][degree]" required>
     </div>
     <div class="form-group">
@@ -162,8 +220,7 @@
       <div class="section-controls">
         <div class="page-selector" style="display: none;">
           <select id="pageSelector{index}" name="sections[{index}][pageSelector]">
-            <option value="all">All Pages</option>
-            <!-- Additional options will be added dynamically -->
+            <!-- Options will be added dynamically -->
           </select>
         </div>
         <button type="button" class="btn-arrow move-up" onclick="moveSection('section-{index}', 'up')" title="Move Up">↑</button>
@@ -174,11 +231,11 @@
     <div class="section-items">
       <div class="section-item">
         <div class="form-group">
-          <label for="company">Company:</label>
+          <label for="company">Company:<span>*</span></label>
           <input type="text" name="sections[{index}][items][0][company]" required>
         </div>
         <div class="form-group">
-          <label for="role">Role:</label>
+          <label for="role">Role:<span>*</span></label>
           <input type="text" name="sections[{index}][items][0][role]" required>
         </div>
         <div class="form-group">
@@ -219,11 +276,11 @@
       </div>
     </div>
     <div class="form-group">
-      <label for="company">Company:</label>
+      <label for="company">Company:<span>*</span></label>
       <input type="text" name="sections[{index}][items][{itemIndex}][company]" required>
     </div>
     <div class="form-group">
-      <label for="role">Role:</label>
+      <label for="role">Role:<span>*</span></label>
       <input type="text" name="sections[{index}][items][{itemIndex}][role]" required>
     </div>
     <div class="form-group">
@@ -256,8 +313,7 @@
       <div class="section-controls">
         <div class="page-selector" style="display: none;">
           <select id="pageSelector{index}" name="sections[{index}][pageSelector]">
-            <option value="all">All Pages</option>
-            <!-- Additional options will be added dynamically -->
+            <!-- Options will be added dynamically -->
           </select>
         </div>
         <button type="button" class="btn-arrow move-up" onclick="moveSection('section-{index}', 'up')" title="Move Up">↑</button>
@@ -268,11 +324,11 @@
     <div class="section-items">
       <div class="section-item">
         <div class="form-group">
-          <label for="title">Title:</label>
+          <label for="title">Title:<span>*</span></label>
           <input type="text" name="sections[{index}][items][0][title]" required>
         </div>
         <div class="form-group">
-          <label for="issuer">Issuer:</label>
+          <label for="issuer">Issuer:<span>*</span></label>
           <input type="text" name="sections[{index}][items][0][issuer]" required>
         </div>
         <div class="form-group">
@@ -305,11 +361,11 @@
       </div>
     </div>
     <div class="form-group">
-      <label for="title">Title:</label>
+      <label for="title">Title:<span>*</span></label>
       <input type="text" name="sections[{index}][items][{itemIndex}][title]" required>
     </div>
     <div class="form-group">
-      <label for="issuer">Issuer:</label>
+      <label for="issuer">Issuer:<span>*</span></label>
       <input type="text" name="sections[{index}][items][{itemIndex}][issuer]" required>
     </div>
     <div class="form-group">
@@ -334,8 +390,7 @@
       <div class="section-controls">
         <div class="page-selector" style="display: none;">
           <select id="pageSelector{index}" name="sections[{index}][pageSelector]">
-            <option value="all">All Pages</option>
-            <!-- Additional options will be added dynamically -->
+            <!-- Options will be added dynamically -->
           </select>
         </div>
         <button type="button" class="btn-arrow move-up" onclick="moveSection('section-{index}', 'up')" title="Move Up">↑</button>
@@ -346,7 +401,7 @@
     <div class="section-items">
       <div class="section-item">
         <div class="form-group">
-          <label for="title">Title:</label>
+          <label for="title">Title:<span>*</span></label>
           <input type="text" name="sections[{index}][items][0][title]" required>
         </div>
         <div class="form-group">
@@ -387,7 +442,7 @@
       </div>
     </div>
     <div class="form-group">
-      <label for="title">Title:</label>
+      <label for="title">Title:<span>*</span></label>
       <input type="text" name="sections[{index}][items][{itemIndex}][title]" required>
     </div>
     <div class="form-group">
@@ -420,8 +475,7 @@
       <div class="section-controls">
         <div class="page-selector" style="display: none;">
           <select id="pageSelector{index}" name="sections[{index}][pageSelector]">
-            <option value="all">All Pages</option>
-            <!-- Additional options will be added dynamically -->
+            <!-- Options will be added dynamically -->
           </select>
         </div>
         <button type="button" class="btn-arrow move-up" onclick="moveSection('section-{index}', 'up')" title="Move Up">↑</button>
@@ -431,7 +485,7 @@
     </div>
     <div class="section-item">
       <div class="form-group">
-        <label for="title">Title:</label>
+        <label for="title">Title:<span>*</span></label>
         <input type="text" name="sections[{index}][items][0][title]" required>
       </div>
       <div class="form-group">
@@ -517,8 +571,12 @@
               // Get the section container that was just added
               const sectionContainer = document.getElementById(`section-${sectionIndex - 1}`);
 
-              // Store the section ID for later use
-              sectionContainer.dataset.sectionId = section._id;
+              // Store the section ID for later use if it exists
+              if (section._id) {
+                sectionContainer.dataset.sectionId = section._id.toString();
+              } else {
+                console.log(`[DEBUG_LOG] Section has no _id, skipping dataset assignment`);
+              }
 
               // Store section data for later processing
               sectionsData.push({
@@ -573,9 +631,13 @@
                     const itemElement = itemElements[itemIndex];
                     console.log(`[DEBUG_LOG] Found item element for ${section.type}, Item ${itemIndex}:`, itemElement);
 
-                    // Store the item ID for later use
-                    itemElement.dataset.itemId = item._id;
-                    console.log(`[DEBUG_LOG] Set item ID: ${item._id} on element`);
+                    // Store the item ID for later use if it exists
+                    if (item._id) {
+                      itemElement.dataset.itemId = item._id.toString();
+                      console.log(`[DEBUG_LOG] Set item ID: ${item._id.toString()} on element`);
+                    } else {
+                      console.log(`[DEBUG_LOG] Item has no _id, skipping dataset assignment`);
+                    }
 
                     // Populate all inputs and textareas in this item
                     const inputs = itemElement.querySelectorAll('input:not([type="hidden"]), textarea');
@@ -1265,7 +1327,7 @@
     div.className = 'form-group';
     div.innerHTML = `
       <div class="page-name-container">
-        <label for="pageName${pageNameIndex}">Page ${pageNameIndex + 1}:</label>
+        <label for="pageName${pageNameIndex}">Page ${pageNameIndex + 1}:<span>*</span></label>
         <input type="text" id="pageName${pageNameIndex}" name="pageNames[${pageNameIndex}]" required>
         <button type="button" class="btn-delete delete-page" onclick="deletePage(this)">Delete</button>
       </div>
@@ -1325,9 +1387,9 @@
       // Save current selection if any
       const currentSelection = selector.value;
 
-      // Clear options except "All Pages"
-      while (selector.options.length > 1) {
-        selector.remove(1);
+      // Clear all options
+      while (selector.options.length > 0) {
+        selector.remove(0);
       }
 
       // Add options for each page
@@ -1339,9 +1401,11 @@
         selector.appendChild(option);
       });
 
-      // Restore selection if it still exists
+      // Restore selection if it still exists, otherwise set to first page (Page 1)
       if (currentSelection && selector.querySelector(`option[value="${currentSelection}"]`)) {
         selector.value = currentSelection;
+      } else if (selector.options.length > 0) {
+        selector.value = 0; // Set to first page (Page 1)
       }
     });
   }
@@ -1404,7 +1468,8 @@
               const sectionPageInput = document.createElement('input');
               sectionPageInput.type = 'hidden';
               sectionPageInput.name = `layout[pages][${pageIndex}][sectionIds][]`;
-              sectionPageInput.value = `section-${sectionIndex}`;
+              // Use the actual section ID from the database if available, otherwise use the element ID
+              sectionPageInput.value = section.dataset.sectionId || `section-${sectionIndex}`;
               this.appendChild(sectionPageInput);
             });
           } else {
@@ -1412,7 +1477,8 @@
             const sectionPageInput = document.createElement('input');
             sectionPageInput.type = 'hidden';
             sectionPageInput.name = `layout[pages][${selectedPage}][sectionIds][]`;
-            sectionPageInput.value = `section-${sectionIndex}`;
+            // Use the actual section ID from the database if available, otherwise use the element ID
+            sectionPageInput.value = section.dataset.sectionId || `section-${sectionIndex}`;
             this.appendChild(sectionPageInput);
           }
         }
@@ -1426,9 +1492,10 @@
       this.appendChild(layoutInput);
     }
 
-    // Ensure all sections have order fields
+    // Ensure all sections have order fields and section IDs
     const sections = document.querySelectorAll('[id^="section-"]');
     sections.forEach((section, index) => {
+      // Add order field
       let orderInput = section.querySelector('input[name$="[order]"]');
       if (!orderInput) {
         orderInput = document.createElement('input');
@@ -1438,11 +1505,24 @@
       }
       orderInput.value = index;
 
-      // Ensure all items in this section have order fields
+      // Add section ID field if available
+      if (section.dataset.sectionId) {
+        let idInput = section.querySelector('input[name$="[_id]"]');
+        if (!idInput) {
+          idInput = document.createElement('input');
+          idInput.type = 'hidden';
+          idInput.name = `sections[${section.dataset.sectionIndex}][_id]`;
+          section.appendChild(idInput);
+        }
+        idInput.value = section.dataset.sectionId;
+      }
+
+      // Ensure all items in this section have order fields and item IDs
       const itemsContainer = section.querySelector('.section-items');
       if (itemsContainer) {
         const items = itemsContainer.querySelectorAll('.section-item');
         items.forEach((item, itemIndex) => {
+          // Add order field
           let itemOrderInput = item.querySelector('input[name$="[order]"]');
           if (!itemOrderInput) {
             itemOrderInput = document.createElement('input');
@@ -1451,6 +1531,18 @@
             item.appendChild(itemOrderInput);
           }
           itemOrderInput.value = itemIndex;
+
+          // Add item ID field if available
+          if (item.dataset.itemId) {
+            let itemIdInput = item.querySelector('input[name$="[_id]"]');
+            if (!itemIdInput) {
+              itemIdInput = document.createElement('input');
+              itemIdInput.type = 'hidden';
+              itemIdInput.name = `sections[${section.dataset.sectionIndex}][items][${itemIndex}][_id]`;
+              item.appendChild(itemIdInput);
+            }
+            itemIdInput.value = item.dataset.itemId;
+          }
         });
       }
     });
