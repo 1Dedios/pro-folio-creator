@@ -2,6 +2,11 @@
     <h2>Your portfolios</h2>
 
     {{#if portfolios.length}}
+    {{#if user.activePortfolioId}}
+    <div style="display: inline-block; margin-bottom: 15px;">
+        <button id="copyActivePortfolioLink" class="btn btn-primary">Copy Link to Active Portfolio</button>
+    </div>
+    {{/if}}
     <div class="grid">
         {{#each portfolios}}
         <article class="card portfolio-card" data-portfolio-id="{{this._id}}">

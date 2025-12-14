@@ -1,6 +1,7 @@
 import express from 'express';
-import {portfolios, themes} from "../data/index.js";
+import {portfolios, themes, users} from "../data/index.js";
 import { ObjectId } from 'mongodb';
+import { users as usersCollection } from '../config/mongoCollections.js';
 
 const router = express.Router();
 
@@ -87,26 +88,34 @@ router.post('/create', async (req, res) => {
             }
         }
 
-        // Get a default theme
+        // Get the selected theme or use a default theme
         let themeId;
         try {
-            const exampleThemes = await themes.getExampleThemes();
-            if (exampleThemes.length > 0) {
-                themeId = exampleThemes[0]._id;
+            if (req.body.themeId) {
+                // Use the selected theme
+                themeId = req.body.themeId;
+
+                // Verify the theme exists
+                await themes.getThemeById(themeId);
             } else {
-                // Create a default theme if none exists
-                const defaultTheme = await themes.createTheme(
-                    null, 
-                    "Default Theme", 
-                    {
-                        primaryColor: "#3B82F6",
-                        accentColor: "#1F2937",
-                        background: "#F9FAFB",
-                        fontFamily: "Inter"
-                    },
-                    true
-                );
-                themeId = defaultTheme._id;
+                // No theme selected, use a default theme
+                const exampleThemes = await themes.getExampleThemes();
+                if (exampleThemes.length > 0) {
+                    themeId = exampleThemes[0]._id;
+                } else {
+                    // Create a default theme if none exists
+                    const defaultTheme = await themes.createTheme(
+                        null, 
+                        "Default Theme", 
+                        {
+                            backgroundColor: "#F9FAFB",
+                            sectionColor: "#FFFFFF",
+                            textColor: "#3B82F6"
+                        },
+                        true
+                    );
+                    themeId = defaultTheme._id;
+                }
             }
         } catch (e) {
             console.error("Error getting theme:", e);
@@ -178,7 +187,7 @@ router.post('/create', async (req, res) => {
             layout,
             themeId,
             contactButtonEnabled === 'on',
-            null
+            false
         );
 
         // Redirect to the new portfolio
@@ -199,9 +208,24 @@ router.get('/portfolio/:id', async (req, res) => {
         const portfolio = await portfolios.getPortfolioById(req.params.id);
         const pageIndex = req.query.page ? parseInt(req.query.page) : 0;
 
+        // Check access permissions
+        // Allow if it's an example portfolio OR if the user is logged in and owns the portfolio
+        if (!portfolio.isExample && 
+            (!req.session.user || req.session.user.userId !== portfolio.ownerId.toString())) {
+            return res.status(403).render('error', { 
+                title: 'Access Denied',
+                error: 'You do not have permission to view this portfolio'
+            });
+        }
+
         // Get the theme for the portfolio
-        // Note: We're ignoring themes for now as specified in the requirements
-        // const theme = await themes.getThemeById(portfolio.themeId);
+        let theme = null;
+        try {
+            theme = await themes.getThemeById(portfolio.themeId);
+        } catch (e) {
+            console.error("Error getting theme:", e);
+            // If theme not found, continue without it
+        }
 
         // Handle multi-page layout
         let currentPageIndex = 0;
@@ -231,7 +255,8 @@ router.get('/portfolio/:id', async (req, res) => {
             portfolio: portfolio,
             currentUser: req.session.user,
             currentPageIndex: currentPageIndex,
-            filteredSections: filteredSections
+            filteredSections: filteredSections,
+            theme: theme
         });
     } catch (e) {
         res.status(404).json({ error: 'Not found' });
@@ -350,6 +375,15 @@ router.post('/portfolio/:id/edit', async (req, res) => {
                             item.order = Number(item.order);
                         }
 
+                        // Check if this item has an ID (for edit operations)
+                        if (item._id) {
+                            // Use the existing ID if available
+                            item._id = new ObjectId(item._id);
+                        } else {
+                            // Create a new ID for new items
+                            item._id = new ObjectId();
+                        }
+
                         items.push(item);
                     }
                 }
@@ -357,8 +391,18 @@ router.post('/portfolio/:id/edit', async (req, res) => {
                 // Convert order to number if it exists
                 const order = section.order !== undefined ? Number(section.order) : 0;
 
+                // Check if this section has an ID (for edit operations)
+                let sectionId;
+                if (section._id) {
+                    // Use the existing ID if available
+                    sectionId = new ObjectId(section._id);
+                } else {
+                    // Create a new ID for new sections
+                    sectionId = new ObjectId();
+                }
+
                 sections.push({
-                    _id: new ObjectId(),
+                    _id: sectionId,
                     type: section.type,
                     items: items,
                     order: order
@@ -417,6 +461,9 @@ router.post('/portfolio/:id/edit', async (req, res) => {
             };
         }
 
+        // Update the portfolio with the selected theme or keep the existing one
+        const themeId = req.body.themeId || existingPortfolio.themeId;
+
         // Update the portfolio
         const updatedPortfolio = await portfolios.updatePortfolio(
             new ObjectId(portfolioId),
@@ -424,9 +471,8 @@ router.post('/portfolio/:id/edit', async (req, res) => {
             description,
             sections,
             layout,
-            existingPortfolio.themeId, // Keep the existing theme
-            contactButtonEnabled === 'on',
-            existingPortfolio.contactEmail // Keep the existing contact email
+            themeId,
+            contactButtonEnabled === 'on'
         );
 
         // Redirect to the updated portfolio
@@ -472,7 +518,6 @@ router.post('/portfolio/:id/copy', async (req, res) => {
             initial.layout || { singlePage: true, pages: [] },
             initial.themeId,
             initial.contactButtonEnabled,
-            null,
             false,
             initial._id
         );
@@ -480,6 +525,86 @@ router.post('/portfolio/:id/copy', async (req, res) => {
     } catch (e) {
         console.error(e);
         res.status(500).send("Error copying portfolio");
+    }
+});
+
+// Route to view a specific user's active portfolio
+router.get('/user/:userId/portfolio', async (req, res) => {
+    try {
+        const userId = req.params.userId;
+
+        // Get the user
+        const userCollection = await usersCollection();
+        const user = await userCollection.findOne({ _id: new ObjectId(userId) });
+
+        if (!user) {
+            return res.status(404).render('error', {
+                title: 'User Not Found',
+                error: 'The specified user does not exist'
+            });
+        }
+
+        // Check if the user has an active portfolio
+        if (!user.activePortfolioId) {
+            return res.render('error', {
+                title: 'No Active Portfolio',
+                error: `This user does not have an active portfolio`
+            });
+        }
+
+        // Get the portfolio directly instead of redirecting
+        const portfolio = await portfolios.getPortfolioById(user.activePortfolioId);
+        const pageIndex = req.query.page ? parseInt(req.query.page) : 0;
+
+        // Get the theme for the portfolio
+        let theme = null;
+        try {
+            theme = await themes.getThemeById(portfolio.themeId);
+        } catch (e) {
+            console.error("Error getting theme:", e);
+            // If theme not found, continue without it
+        }
+
+        // Handle multi-page layout
+        let currentPageIndex = 0;
+        let filteredSections = portfolio.sections;
+
+        if (!portfolio.layout.singlePage && portfolio.layout.pages && portfolio.layout.pages.length > 0) {
+            // Validate page index
+            currentPageIndex = Math.min(Math.max(0, pageIndex), portfolio.layout.pages.length - 1);
+
+            // Filter sections for the current page
+            if (currentPageIndex < portfolio.layout.pages.length) {
+                const currentPage = portfolio.layout.pages[currentPageIndex];
+                if (currentPage && currentPage.sectionIds) {
+                    // Convert sectionIds to strings for comparison
+                    const pageSectionIds = currentPage.sectionIds.map(id => id.toString());
+
+                    // Filter sections that belong to this page
+                    filteredSections = portfolio.sections.filter(section => 
+                        pageSectionIds.includes(section._id.toString())
+                    );
+                }
+            }
+        }
+
+        // Render the portfolio view directly
+        res.render('portfolio', {
+            title: portfolio.title,
+            portfolio: portfolio,
+            currentUser: req.session.user,
+            currentPageIndex: currentPageIndex,
+            filteredSections: filteredSections,
+            theme: theme,
+            isUserProfileRoute: true,
+            userId: userId
+        });
+    } catch (e) {
+        console.error("Error viewing user's active portfolio:", e);
+        res.status(500).render('error', {
+            title: 'Error',
+            error: 'An error occurred while trying to view the user\'s active portfolio'
+        });
     }
 });
 

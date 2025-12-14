@@ -40,9 +40,16 @@ router.post('/signup', async (req, res) => {
     const newEmail = newUserData.email;
     const newPassword = newUserData.password;
     const newUser = await users.createUser(newUserName, newEmail, newPassword);
-    //to-do: handle what to do after user is created, right now just showing the json user data
-    // maybe back to login page or directly to their default portfolio '/portfolios/user/:userId'
-    res.json(newUser);  
+
+    // Set session data to log in the user automatically
+    req.session.user = {
+      username: newUser.username,
+      email: newUser.email,
+      userId: newUser._id.toString()
+    };
+
+    // Redirect to user profile page
+    res.redirect('/users/profile');
   }
   catch (e) {
     console.log("error post users/signup");
@@ -131,7 +138,7 @@ router.get('/profile', async (req, res) => {
       activePortfolioId: fullUser.activePortfolioId ? String(fullUser.activePortfolioId) : null
     };
 
-    
+
 
     // create JSON string to be safely injected into client JS
     const userJson = JSON.stringify({

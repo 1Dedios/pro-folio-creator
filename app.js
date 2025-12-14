@@ -52,6 +52,7 @@ app.set('views', join(__dirname, 'views'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/public", express.static(join(__dirname, "public")));
+app.use("/node_modules/vanilla-colorful", express.static(join(__dirname, "node_modules/vanilla-colorful")));
 app.use(
   session({
     name: "ProFolio",
@@ -105,8 +106,8 @@ process.on("SIGINT", async () => {
 
   isShuttingDown = true;
   console.log("\nBeginning DB Shutdown...");
-  console.log("PRO-folio closing in 5 sec");
-  setTimeout(dbShutdown, 5000);
+  console.log("PRO-folio closing in 1 sec");
+  setTimeout(dbShutdown, 1000);
 });
 
 const dbShutdown = async () => {
