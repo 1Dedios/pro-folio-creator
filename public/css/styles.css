@@ -48,6 +48,14 @@ header {
   padding: 0 1rem;
 }*/
 
+.header-nav ul {
+  list-style: none;
+  display: flex;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+}
+
 .nav-logo {
   height: 50px;
   width: auto;
@@ -158,11 +166,10 @@ main {
   padding: 0;
   margin: 0;
   border-bottom: 1px solid var(--light-gray);
-  overflow-x: auto;
+  overflow: hidden;
 }
 
 .page-tab {
-  padding: 0.75rem 1.25rem;
   cursor: pointer;
   border: 1px solid transparent;
   border-bottom: none;
@@ -190,6 +197,9 @@ main {
   color: var(--text-color);
   text-decoration: none;
   display: block;
+  padding: 0.75rem 1.25rem;
+  width: 100%;
+  height: 100%;
 }
 
 .page-tab.active a {
@@ -208,6 +218,17 @@ main {
   margin-top: 1rem;
 }
 
+.portfolio-actions form {
+  display: inline-block;
+}
+
+.portfolio-actions button,
+.portfolio-actions a {
+  height: 36px;
+  line-height: 1;
+  vertical-align: middle;
+}
+
 .btn-edit, .btn-copy {
   display: inline-block;
   padding: 0.5rem 1rem;
@@ -217,6 +238,9 @@ main {
   cursor: pointer;
   transition: all 0.2s ease;
   text-decoration: none;
+  line-height: 1.2;
+  height: auto;
+  box-sizing: border-box;
 }
 
 .btn-edit {
@@ -234,6 +258,9 @@ main {
   background-color: var(--white);
   color: var(--primary-color);
   border: 1px solid var(--primary-color);
+  font-size: inherit;
+  font-family: inherit;
+  margin: 0;
 }
 
 .btn-copy:hover {
@@ -423,6 +450,100 @@ main {
   text-decoration: none;
 }
 
+/* Card Styles */
+.card header {
+  background-color: transparent;
+  box-shadow: none;
+  padding: 0;
+}
+
+/* Theme Selection Styles */
+.theme-selection {
+  margin-bottom: 2rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.theme-preview {
+  border: 1px solid var(--light-gray);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  height: 200px;
+}
+
+.theme-preview-header {
+  background-color: var(--accent-color);
+  color: var(--white);
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+}
+
+.theme-preview-content {
+  height: calc(100% - 36px);
+}
+
+.preview-background {
+  width: 100%;
+  height: 100%;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.preview-section {
+  width: 80%;
+  height: 80%;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.preview-text {
+  font-weight: 500;
+}
+
+#createThemeBtn {
+  grid-column: span 2;
+  width: fit-content;
+  justify-self: center;
+}
+
+#createThemeForm {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background-color: var(--background-color);
+  border: 1px solid var(--light-gray);
+  border-radius: 0.5rem;
+}
+
+.color-pickers {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.color-picker-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.color-picker {
+  width: 100%;
+  height: 200px;
+  margin: 0.5rem 0;
+}
+
+.theme-form-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
 /* Responsive Adjustments */
 @media (max-width: 768px) {
   .cta-buttons {
@@ -435,6 +556,10 @@ main {
   }
 
   .portfolios-list {
+    grid-template-columns: 1fr;
+  }
+
+  .theme-selection {
     grid-template-columns: 1fr;
   }
 }

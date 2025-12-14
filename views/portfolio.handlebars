@@ -1,3 +1,30 @@
+{{#if theme}}
+<style>
+    body {
+        background-color: {{theme.themeData.backgroundColor}};
+        color: {{theme.themeData.textColor}};
+    }
+
+    .portfolio-section, .education-item, .work-item, .certification-item, .project-item, .custom-section, .contact-section {
+        background-color: {{theme.themeData.sectionColor}};
+    }
+
+    .portfolio-container h1, .portfolio-container h2, .portfolio-container h3, .portfolio-container h4, .portfolio-container h5, .portfolio-container p {
+        color: {{theme.themeData.textColor}};
+    }
+
+    .portfolio-navigation, footer {
+        background-color: {{theme.themeData.backgroundColor}};
+        color: {{theme.themeData.textColor}};
+    }
+
+    .portfolio-header {
+        background-color: {{theme.themeData.backgroundColor}};
+        color: {{theme.themeData.textColor}};
+    }
+</style>
+{{/if}}
+
 <div class="portfolio-container">
     <div class="portfolio-header">
         <h1>{{portfolio.title}}</h1>
@@ -20,7 +47,11 @@
             <ul class="page-tabs">
                 {{#each portfolio.layout.pages}}
                     <li class="page-tab {{#if (eq @index ../currentPageIndex)}}active{{/if}}">
-                        <a href="/portfolio/{{../portfolio._id}}?page={{@index}}">{{this.title}}</a>
+                        {{#if ../isUserProfileRoute}}
+                            <a href="/user/{{../userId}}/portfolio?page={{@index}}">{{this.title}}</a>
+                        {{else}}
+                            <a href="/portfolio/{{../portfolio._id}}?page={{@index}}">{{this.title}}</a>
+                        {{/if}}
                     </li>
                 {{/each}}
             </ul>

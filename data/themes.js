@@ -20,19 +20,15 @@ const validateThemeData = (themeData) => {
   }
 
   // Validate required fields
-  if (!themeData.primaryColor) throw 'Theme data must include primaryColor';
-  if (!themeData.accentColor) throw 'Theme data must include accentColor';
-  if (!themeData.background) throw 'Theme data must include background';
-  if (!themeData.fontFamily) throw 'Theme data must include fontFamily';
+  if (!themeData.backgroundColor) throw 'Theme data must include backgroundColor';
+  if (!themeData.sectionColor) throw 'Theme data must include sectionColor';
+  if (!themeData.textColor) throw 'Theme data must include textColor';
 
   // Validate color formats (hex codes)
   const colorRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
-  if (!colorRegex.test(themeData.primaryColor)) throw 'Primary color must be a valid hex color code';
-  if (!colorRegex.test(themeData.accentColor)) throw 'Accent color must be a valid hex color code';
-  if (!colorRegex.test(themeData.background)) throw 'Background color must be a valid hex color code';
-
-  // Validate font family
-  themeData.fontFamily = validateString(themeData.fontFamily, 'Font family');
+  if (!colorRegex.test(themeData.backgroundColor)) throw 'Background color must be a valid hex color code';
+  if (!colorRegex.test(themeData.sectionColor)) throw 'Section color must be a valid hex color code';
+  if (!colorRegex.test(themeData.textColor)) throw 'Text color must be a valid hex color code';
 
   return themeData;
 };
@@ -43,7 +39,7 @@ export const createTheme = async (ownerId, name, themeData, isExample = false) =
   if (ownerId !== null) {
     ownerId = validateObjectId(ownerId);
   }
-  
+
   name = validateThemeName(name);
   themeData = validateThemeData(themeData);
   isExample = validateBoolean(isExample, 'Is example');
@@ -82,12 +78,12 @@ export const getThemeById = async (themeId) => {
 export const getAllThemes = async (ownerId = null) => {
   const themeCollection = await themes();
   let query = {};
-  
+
   if (ownerId !== null) {
     ownerId = validateObjectId(ownerId);
     query = { ownerId };
   }
-  
+
   const themeList = await themeCollection.find(query).toArray();
   return themeList;
 };
@@ -107,7 +103,7 @@ export const updateTheme = async (themeId, name, themeData) => {
 
   // Get the existing theme to check ownership
   const existingTheme = await getThemeById(themeId);
-  
+
   // Don't allow updating example themes
   if (existingTheme.isExample) {
     throw 'Cannot update example themes';
@@ -131,10 +127,10 @@ export const updateTheme = async (themeId, name, themeData) => {
 // Delete a theme
 export const removeTheme = async (themeId) => {
   themeId = validateObjectId(themeId);
-  
+
   // Get the existing theme to check if it's an example
   const existingTheme = await getThemeById(themeId);
-  
+
   // Don't allow deleting example themes
   if (existingTheme.isExample) {
     throw 'Cannot delete example themes';
@@ -150,13 +146,13 @@ export const removeTheme = async (themeId) => {
 export const cloneTheme = async (themeId, ownerId, newName = null) => {
   themeId = validateObjectId(themeId);
   ownerId = validateObjectId(ownerId);
-  
+
   // Get the theme to clone
   const themeToClone = await getThemeById(themeId);
-  
+
   // Set the new name or use the original with " (Copy)" appended
   const name = newName ? validateThemeName(newName) : `${themeToClone.name} (Copy)`;
-  
+
   // Create a new theme based on the cloned one
   return await createTheme(ownerId, name, themeToClone.themeData, false);
 };

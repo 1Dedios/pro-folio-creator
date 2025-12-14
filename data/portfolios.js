@@ -297,7 +297,6 @@ export const createPortfolio = async (
   layout = { singlePage: true, pages: [] },
   themeId,
   contactButtonEnabled = false,
-  contactEmail = null,
   isExample = false,
   copiedFromPortfolioId = null
 ) => {
@@ -306,17 +305,6 @@ export const createPortfolio = async (
   description = validateDescription(description);
   themeId = validateObjectId(themeId);
   contactButtonEnabled = validateBoolean(contactButtonEnabled, 'Contact button enabled');
-
-  if (contactButtonEnabled && contactEmail) {
-    console.log('contactButtonEnabled');
-    contactEmail = validateEmail(contactEmail);
-  } else if (contactButtonEnabled) {
-    // If contact is enabled but no email provided, get user's email
-    const userCollection = await users();
-    const user = await userCollection.findOne({ _id: ownerId });
-    if (!user) throw 'Owner not found';
-    contactEmail = user.email;
-  }
 
   // Validate theme exists
   const themeCollection = await themes();
@@ -355,7 +343,6 @@ export const createPortfolio = async (
     layout,
     themeId,
     contactButtonEnabled,
-    contactEmail,
     isExample,
     copiedFromPortfolioId,
     createdAt: new Date(),
@@ -415,8 +402,7 @@ export const updatePortfolio = async (
   sections,
   layout,
   themeId,
-  contactButtonEnabled,
-  contactEmail
+  contactButtonEnabled
 ) => {
   portfolioId = validateObjectId(portfolioId);
 
@@ -432,16 +418,6 @@ export const updatePortfolio = async (
   description = validateDescription(description);
   themeId = validateObjectId(themeId);
   contactButtonEnabled = validateBoolean(contactButtonEnabled, 'Contact button enabled');
-
-  if (contactButtonEnabled && contactEmail) {
-    contactEmail = validateEmail(contactEmail);
-  } else if (contactButtonEnabled) {
-    // If contact is enabled but no email provided, get user's email
-    const userCollection = await users();
-    const user = await userCollection.findOne({ _id: existingPortfolio.ownerId });
-    if (!user) throw 'Owner not found';
-    contactEmail = user.email;
-  }
 
   // Validate theme exists
   const themeCollection = await themes();
@@ -470,7 +446,6 @@ export const updatePortfolio = async (
         layout,
         themeId,
         contactButtonEnabled,
-        contactEmail,
         updatedAt: new Date()
       } 
     }
@@ -526,7 +501,6 @@ export const clonePortfolio = async (portfolioId, ownerId, newTitle = null) => {
     portfolioToClone.layout,
     portfolioToClone.themeId,
     portfolioToClone.contactButtonEnabled,
-    portfolioToClone.contactEmail,
     false, // Not an example
     portfolioId // Reference to the source portfolio
   );
