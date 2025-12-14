@@ -1,11 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<<<<<<< Updated upstream
-
-<head>
-=======
   <head>
->>>>>>> Stashed changes
     <meta charset="utf-8">
     <title>{{title}}</title>
     <link rel="stylesheet" href="/public/css/styles.css">
@@ -14,22 +9,6 @@
 
 <body>
     <header class="common-header">
-<<<<<<< Updated upstream
-        <div class="header-left">
-            <a href="/"><img src="/public/images/ProFolio-Logo.png" alt="Logo" class="nav-logo"></a>
-        </div>
-        <nav class="header-nav">
-            <ul>
-                {{#if user}}
-                <li><a href="/users/profile">Profile</a></li>
-                <li><a href="/users/logout">Log Out</a></li>
-                {{else}}
-                <li><a href="/users/signup">Sign Up</a></li>
-                <li><a href="/users/login">Log In</a></li>
-                {{/if}}
-            </ul>
-        </nav>
-=======
       <div class="header-left">
         <a href="/"
           ><img
@@ -49,7 +28,6 @@
           {{/if}}
         </ul>
       </nav>
->>>>>>> Stashed changes
     </header>
 
     <main>
@@ -58,10 +36,7 @@
 
     <footer>ProFolio</footer>
 
-<<<<<<< Updated upstream
-=======
     <script type="module" src="/public/js/formValidation.js"></script>
->>>>>>> Stashed changes
     <script>
         // If server passed userJson it will be an object literal here; else use null
         window.__APP_USER = {{#if userJson}}{{{ userJson }}}{{else}}null{{/if}};
@@ -69,12 +44,8 @@
         // console.log('APP_USER:', window.__APP_USER, 'APP_ACTIVE:', window.__APP_ACTIVE);
     </script>
 
-<<<<<<< Updated upstream
-    <script type="module" src="/public/js/portfolios.js" defer></script>
-=======
     <script type="module" src="/public/js/portfolios.js"></script>
     <script type="module" src="/public/js/themes.js"></script>
->>>>>>> Stashed changes
 
 
 </body>
