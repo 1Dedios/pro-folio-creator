@@ -22,9 +22,7 @@ router
     }
   })
   .post(async (req, res) => {
-    console.log("ON THE SERVER");
     const { senderName, senderEmail, message } = req.body;
-    console.log(senderName, senderEmail, message);
     const validationErrors = {};
     let validatedName;
     let validatedEmail;
@@ -33,7 +31,6 @@ router
     // xss mitigation
     let fieldsArr = [senderName, senderEmail, message];
     fieldsArr = escapeHTML(fieldsArr);
-    console.log("ON THE SERVER");
 
     try {
       validatedName = validateString(fieldsArr[0]);
@@ -91,7 +88,6 @@ router
         delay: 3000,
       });
     } catch (e) {
-      console.log("SERVER ERROR");
       console.warn(e);
       return res.status(500).json({ error: e });
     }

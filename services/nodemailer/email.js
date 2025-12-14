@@ -20,8 +20,8 @@ export default async function sendEmail(
       replyTo: `${senderEmail}`,
       // Note: can extend to include portfolio name or portfolio id from which message was sent
       subject: `New Message from ${senderName} about one of your Pro-folios!`,
-      text: `${message}`,
-      html: `<p>${message}</p>`,
+      text: `${message}\r\nYou can reply directly to this email to respond to ${senderEmail}.`,
+      html: `<p>${message}</p><br><p style="font-weight: bold; color: red">You can reply directly to this email to respond to ${senderEmail}.</p>`,
     });
   } catch (error) {
     throw error;
@@ -31,10 +31,7 @@ export default async function sendEmail(
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    type: "OAuth2",
     user: process.env.PROFOLIO,
-    clientId: process.env.PROFOLIO_CLIENT_ID,
-    clientSecret: process.env.PROFOLIO_CLIENT_SECRET,
-    refreshToken: process.env.PROFOLIO_REFRESH_TOKEN,
+    pass: process.env.PROFOLIO_PASS,
   },
 });
