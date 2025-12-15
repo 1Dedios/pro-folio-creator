@@ -63,7 +63,12 @@ router.post('/create', async (req, res) => {
                             try {
                                 item.technologies = JSON.parse(item.technologies);
                             } catch (e) {
-                                item.technologies = [];
+                                // If JSON parsing fails, try treating it as a comma-separated string
+                                if (typeof item.technologies === 'string') {
+                                    item.technologies = item.technologies.split(',').map(tech => tech.trim()).filter(tech => tech !== '');
+                                } else {
+                                    item.technologies = [];
+                                }
                             }
                         }
 
@@ -118,7 +123,7 @@ router.post('/create', async (req, res) => {
                 }
             }
         } catch (e) {
-            console.error("Error getting theme:", e);
+            // console.error("Error getting theme:", e);
             return res.status(400).render('create', { 
                 title: 'Create Your Own Portfolio',
                 error: 'Error creating portfolio: Could not get theme',
@@ -193,7 +198,7 @@ router.post('/create', async (req, res) => {
         // Redirect to the new portfolio
         res.redirect(`/portfolio/${newPortfolio._id}`);
     } catch (e) {
-        console.error("Error creating portfolio:", e);
+        // console.error("Error creating portfolio:", e);
         return res.status(400).render('create', { 
             title: 'Create Your Own Portfolio',
             error: 'Error creating portfolio: ' + e,
@@ -265,27 +270,27 @@ router.get('/portfolio/:id', async (req, res) => {
 
 router.get('/portfolio/:id/edit', async (req, res) => {
     try {
-        console.log('[DEBUG_LOG] Edit portfolio route accessed for ID:', req.params.id);
+        // console.log('[DEBUG_LOG] Edit portfolio route accessed for ID:', req.params.id);
 
         // Check if user is logged in
         if (!req.session.user) {
-            console.log('[DEBUG_LOG] User not logged in, redirecting to login');
+            // console.log('[DEBUG_LOG] User not logged in, redirecting to login');
             return res.redirect('/users/login');
         }
 
-        console.log('[DEBUG_LOG] Fetching portfolio from database...');
+        // console.log('[DEBUG_LOG] Fetching portfolio from database...');
         const portfolio = await portfolios.getPortfolioById(req.params.id);
-        console.log('[DEBUG_LOG] Portfolio retrieved from DB:', JSON.stringify(portfolio, null, 2));
+        // console.log('[DEBUG_LOG] Portfolio retrieved from DB:', JSON.stringify(portfolio, null, 2));
 
         // Log sections and items specifically
         if (portfolio.sections) {
-            console.log('[DEBUG_LOG] Number of sections:', portfolio.sections.length);
+            // console.log('[DEBUG_LOG] Number of sections:', portfolio.sections.length);
             portfolio.sections.forEach((section, i) => {
-                console.log(`[DEBUG_LOG] Section ${i} (${section.type}):`, JSON.stringify(section, null, 2));
+                // console.log(`[DEBUG_LOG] Section ${i} (${section.type}):`, JSON.stringify(section, null, 2));
                 if (section.items) {
-                    console.log(`[DEBUG_LOG] Section ${i} has ${section.items.length} items`);
+                    // console.log(`[DEBUG_LOG] Section ${i} has ${section.items.length} items`);
                     section.items.forEach((item, j) => {
-                        console.log(`[DEBUG_LOG] Section ${i}, Item ${j}:`, JSON.stringify(item, null, 2));
+                        // console.log(`[DEBUG_LOG] Section ${i}, Item ${j}:`, JSON.stringify(item, null, 2));
                     });
                 }
             });
@@ -293,14 +298,14 @@ router.get('/portfolio/:id/edit', async (req, res) => {
 
         // Check if the logged-in user is the owner of the portfolio
         if (portfolio.ownerId.toString() !== req.session.user.userId) {
-            console.log('[DEBUG_LOG] User is not the owner of this portfolio');
+            // console.log('[DEBUG_LOG] User is not the owner of this portfolio');
             return res.status(403).render('error', { 
                 title: 'Access Denied',
                 error: 'You do not have permission to edit this portfolio'
             });
         }
 
-        console.log('[DEBUG_LOG] Rendering create page with portfolio data');
+        // console.log('[DEBUG_LOG] Rendering create page with portfolio data');
         // Render the create page with the portfolio data
         res.render('create', { 
             title: 'Edit Portfolio',
@@ -366,7 +371,12 @@ router.post('/portfolio/:id/edit', async (req, res) => {
                             try {
                                 item.technologies = JSON.parse(item.technologies);
                             } catch (e) {
-                                item.technologies = [];
+                                // If JSON parsing fails, try treating it as a comma-separated string
+                                if (typeof item.technologies === 'string') {
+                                    item.technologies = item.technologies.split(',').map(tech => tech.trim()).filter(tech => tech !== '');
+                                } else {
+                                    item.technologies = [];
+                                }
                             }
                         }
 
@@ -505,22 +515,166 @@ router.post('/portfolio/:id/edit', async (req, res) => {
 
 router.post('/portfolio/:id/copy', async (req, res) => {
     try {
+        // console.log("[DEBUG_LOG] Starting portfolio copy process");
         const initial = await portfolios.getPortfolioById(req.params.id);      //find original portfolio by ID
+        // console.log(`[DEBUG_LOG] Original portfolio: ID=${initial._id}, Title=${initial.title}`);
+        // console.log(`[DEBUG_LOG] Original portfolio has ${initial.sections ? initial.sections.length : 0} sections`);
+        // console.log(`[DEBUG_LOG] Original layout: singlePage=${initial.layout ? initial.layout.singlePage : 'undefined'}`);
+
+        if (initial.layout && !initial.layout.singlePage && initial.layout.pages) {
+            // console.log(`[DEBUG_LOG] Original layout has ${initial.layout.pages.length} pages`);
+            initial.layout.pages.forEach((page, i) => {
+                // console.log(`[DEBUG_LOG] Original page ${i}: title=${page.title}, sectionIds=${page.sectionIds ? page.sectionIds.map(id => id.toString()).join(', ') : 'none'}`);
+            });
+        }
 
         if (!req.session.user) {                                                //ensure user is logged in
             return res.status(401).send("Must be logged in to copy a portfolio.");
         }
-        await portfolios.createPortfolio(
+
+        // Create deep copies of sections with new IDs
+        const sectionIdMap = new Map(); // Map old section IDs to new section IDs
+        const newSections = initial.sections.map(section => {
+            const oldId = section._id.toString();
+            // Deep copy the section
+            const sectionCopy = JSON.parse(JSON.stringify(section));
+            // Create a new section with a new ID
+            const newId = new ObjectId();
+            const newSection = { ...sectionCopy, _id: newId };
+
+            // Ensure any nested _id properties are also converted to ObjectId
+            if (newSection.items && Array.isArray(newSection.items)) {
+                newSection.items = newSection.items.map(item => {
+                    if (item && item._id) {
+                        return { ...item, _id: new ObjectId() };
+                    }
+                    return item;
+                });
+            }
+            sectionIdMap.set(oldId, newId);
+            // console.log(`[DEBUG_LOG] Mapping section ID: ${oldId} -> ${newId}`);
+            return newSection;
+        });
+
+        // Create a deep copy of the layout and update section IDs
+        let newLayout = initial.layout ? JSON.parse(JSON.stringify(initial.layout)) : { singlePage: true, pages: [] };
+        // console.log(`[DEBUG_LOG] New layout: singlePage=${newLayout ? newLayout.singlePage : 'undefined'}`);
+
+        // If it's a multi-page layout, update the section IDs in each page
+        if (newLayout && !newLayout.singlePage && newLayout.pages && newLayout.pages.length > 0) {
+            // console.log(`[DEBUG_LOG] Updating section IDs in multi-page layout`);
+            // console.log(`[DEBUG_LOG] Layout has ${newLayout.pages.length} pages`);
+
+            // Ensure layout.pages is an array
+            if (!Array.isArray(newLayout.pages)) {
+                console.error(`[DEBUG_LOG] ERROR: newLayout.pages is not an array:`, newLayout.pages);
+                newLayout.pages = [];
+            }
+
+            newLayout.pages = newLayout.pages.map((page, pageIndex) => {
+                if (!page) {
+                    console.error(`[DEBUG_LOG] ERROR: Page ${pageIndex} is null or undefined`);
+                    return { title: `Page ${pageIndex + 1}`, sectionIds: [] };
+                }
+
+                // console.log(`[DEBUG_LOG] Processing page ${pageIndex}: ${page.title}`);
+
+                // Ensure page has a title
+                if (!page.title) {
+                    console.warn(`[DEBUG_LOG] WARNING: Page ${pageIndex} has no title, setting default title`);
+                    page.title = `Page ${pageIndex + 1}`;
+                }
+
+                // Ensure page.sectionIds is an array
+                if (!page.sectionIds) {
+                    console.warn(`[DEBUG_LOG] WARNING: Page ${pageIndex} has no sectionIds, creating empty array`);
+                    page.sectionIds = [];
+                }
+
+                if (!Array.isArray(page.sectionIds)) {
+                    console.error(`[DEBUG_LOG] ERROR: Page ${pageIndex} sectionIds is not an array:`, page.sectionIds);
+                    page.sectionIds = [];
+                }
+
+                if (page.sectionIds && page.sectionIds.length > 0) {
+                    // console.log(`[DEBUG_LOG] Page ${pageIndex} has ${page.sectionIds.length} section IDs before update`);
+
+                    // Update section IDs using the mapping
+                    const newSectionIds = page.sectionIds.map(oldId => {
+                        if (!oldId) {
+                            console.error(`[DEBUG_LOG] ERROR: oldId is null or undefined`);
+                            return null;
+                        }
+
+                        const oldIdStr = oldId.toString();
+                        if (sectionIdMap.has(oldIdStr)) {
+                            const newId = sectionIdMap.get(oldIdStr);
+                            // console.log(`[DEBUG_LOG] Updating page ${pageIndex} section ID: ${oldIdStr} -> ${newId}`);
+                            return newId;
+                        } else {
+                            console.error(`[DEBUG_LOG] ERROR: Could not find mapping for section ID: ${oldIdStr}`);
+                            // Try to find the section in the new sections array by comparing properties
+                            const originalSection = initial.sections.find(s => s._id.toString() === oldIdStr);
+                            if (originalSection) {
+                                const matchingNewSection = newSections.find(s => 
+                                    s.type === originalSection.type && 
+                                    JSON.stringify(s.items) === JSON.stringify(originalSection.items)
+                                );
+                                if (matchingNewSection) {
+                                    // console.log(`[DEBUG_LOG] Found matching section by properties: ${matchingNewSection._id}`);
+                                    return matchingNewSection._id;
+                                }
+                            }
+                            // If we can't find a match, return null instead of the original ID
+                            // console.log(`[DEBUG_LOG] No matching section found, returning null`);
+                            return null;
+                        }
+                    }).filter(id => id !== null); // Remove any null values
+
+                    // console.log(`[DEBUG_LOG] Page ${pageIndex} has ${newSectionIds.length} section IDs after update`);
+                    return { ...page, sectionIds: newSectionIds };
+                } else {
+                    // If the page has no sectionIds, assign all sections to this page
+                    // This ensures that even if sectionIds are empty, the page will still have sections
+                    // console.log(`[DEBUG_LOG] Page ${pageIndex} has no sectionIds, assigning all sections to this page`);
+                    const allNewSectionIds = newSections.map(section => section._id);
+                    // console.log(`[DEBUG_LOG] Assigned ${allNewSectionIds.length} sections to page ${pageIndex}`);
+                    return { ...page, sectionIds: allNewSectionIds };
+                }
+            });
+        } else {
+            // console.log(`[DEBUG_LOG] Not a multi-page layout or no pages found`);
+            // console.log(`[DEBUG_LOG] newLayout:`, JSON.stringify(newLayout));
+
+            // If it's a single-page layout, ensure all sections are included
+            if (newLayout && newLayout.singlePage) {
+                // console.log(`[DEBUG_LOG] Single-page layout, ensuring all sections are included`);
+                // For single-page layouts, we don't need to do anything special as all sections are shown
+            }
+        }
+
+        // console.log(`[DEBUG_LOG] Creating new portfolio with ${newSections.length} sections`);
+        const newPortfolio = await portfolios.createPortfolio(
             new ObjectId(req.session.user.userId),
             initial.title + ' - Copy',
             initial.description,
-            initial.sections,
-            initial.layout || { singlePage: true, pages: [] },
+            newSections,
+            newLayout,
             initial.themeId,
             initial.contactButtonEnabled,
             false,
             initial._id
         );
+        // console.log(`[DEBUG_LOG] New portfolio created: ID=${newPortfolio._id}, Title=${newPortfolio.title}`);
+        // console.log(`[DEBUG_LOG] New portfolio has ${newPortfolio.sections ? newPortfolio.sections.length : 0} sections`);
+
+        if (newPortfolio.layout && !newPortfolio.layout.singlePage && newPortfolio.layout.pages) {
+            // console.log(`[DEBUG_LOG] New layout has ${newPortfolio.layout.pages.length} pages`);
+            newPortfolio.layout.pages.forEach((page, i) => {
+                // console.log(`[DEBUG_LOG] New page ${i}: title=${page.title}, sectionIds=${page.sectionIds ? page.sectionIds.map(id => id.toString()).join(', ') : 'none'}`);
+            });
+        }
+
         res.redirect('/users/profile');
     } catch (e) {
         console.error(e);

@@ -5,8 +5,43 @@
     <title>{{title}}</title>
     <link rel="stylesheet" href="/public/css/styles.css">
     <link rel="stylesheet" href="/public/css/ui-fixes.css">
+    {{#if title}}
+      {{#ifEquals title "Create Your Own Portfolio"}}
+        <link rel="stylesheet" href="/public/css/create-portfolio.css">
+      {{else}}
+        {{#ifEquals title "Edit Portfolio"}}
+          <link rel="stylesheet" href="/public/css/create-portfolio.css">
+        {{/ifEquals}}
+      {{/ifEquals}}
+    {{/if}}
     <!-- Vanilla Colorful color picker (locally installed) -->
     <script type="module" src="/node_modules/vanilla-colorful/hex-color-picker.js"></script>
+    {{#if theme}}
+      <style>
+        body {
+            background-color: {{theme.themeData.backgroundColor}};
+            color: {{theme.themeData.textColor}};
+        }
+
+        .portfolio-section, .education-item, .work-item, .certification-item, .project-item, .custom-section, .contact-section {
+            background-color: {{theme.themeData.sectionColor}};
+        }
+
+        .portfolio-container h1, .portfolio-container h2, .portfolio-container h3, .portfolio-container h4, .portfolio-container h5, .portfolio-container p {
+            color: {{theme.themeData.textColor}};
+        }
+
+        .portfolio-navigation, footer {
+            background-color: {{theme.themeData.backgroundColor}};
+            color: {{theme.themeData.textColor}};
+        }
+
+        .portfolio-header {
+            background-color: {{theme.themeData.backgroundColor}};
+            color: {{theme.themeData.textColor}};
+        }
+      </style>
+    {{/if}}
 </head>
 
   <body>
@@ -38,7 +73,7 @@
         <a href="/" class ="footer-link">ProFolio</a>
     </footer>
 
-    <script type="module" src="/public/js/formValidation.js" defer></script>
+    <script type="module" src="/public/js/formValidation.js"></script>
     <script>
       // If server passed userJson it will be an object literal here; else use null
       window.__APP_USER = {{#if userJson}}{{{ userJson }}}{{else}}null{{/if}};
@@ -46,8 +81,8 @@
       // console.log('APP_USER:', window.__APP_USER, 'APP_ACTIVE:', window.__APP_ACTIVE);
     </script>
 
-    <script type="module" src="/public/js/portfolios.js" defer></script>
-    <script type="module" src="/public/js/themes.js" defer></script>
+    <script type="module" src="/public/js/portfolios.js"></script>
+    <script type="module" src="/public/js/themes.js"></script>
 
 
 </body>

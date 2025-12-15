@@ -57,9 +57,10 @@ router
     try {
       let userEmail;
       const { portfolioId } = req.params;
+      let getPortfolio;
 
       try {
-        const getPortfolio = await getPortfolioById(portfolioId);
+        getPortfolio = await getPortfolioById(portfolioId);
         const getUser = await getUserById(getPortfolio.ownerId);
         userEmail = getUser.email;
 
@@ -85,6 +86,7 @@ router
       return res.render("success", {
         senderName: validatedName,
         portfolioId: portfolioId,
+        userId: getPortfolio.ownerId,
         delay: 3000,
       });
     } catch (e) {

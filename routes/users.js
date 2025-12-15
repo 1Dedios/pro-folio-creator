@@ -14,28 +14,28 @@ router.get('/id/:id', async (req, res) => {
     const user = await users.getUserById(req.params.id);
     res.json(user);
   } catch (e) {
-    res.status(404).json({ error: e });
+    return res.status(404).render('error', {title: 'Page Not Found', error: e});
   }
 });
 
 //get users/signup page with form
 router.get('/signup', async (req, res) => {
   try {
-    console.log("render get users/signup");
-    res.render('users/signup', { title: 'ProFolio User Sign Up'});
+    // console.log("render get users/signup");
+    return res.render('users/signup', { title: 'ProFolio User Sign Up'});
   }
   catch (e) {
-    console.log("error rendering users/signup");
-    res.status(500).json({ error: e});
+    // console.log("error rendering users/signup");
+    return res.status(500).render('error', {title: 'Error', error: e});
   }
 });
 
 //post users/signup to create new user
 router.post('/signup', async (req, res) => {
   try {
-    console.log("post users/signup");
+    // console.log("post users/signup");
     const newUserData = req.body;
-    console.log(newUserData);
+    // console.log(newUserData);
     const newUserName = newUserData.username;
     const newEmail = newUserData.email;
     const newPassword = newUserData.password;
@@ -52,7 +52,7 @@ router.post('/signup', async (req, res) => {
     res.redirect('/users/profile');
   }
   catch (e) {
-    console.log("error post users/signup");
+    // console.log("error post users/signup");
     //to-do: have a better way to handle error when creating user: probably take them back to signup page
     //to-do: also need to add client-side form validation
     res.status(500).json({error: e});
@@ -62,30 +62,30 @@ router.post('/signup', async (req, res) => {
 //get users/login page with login form
 router.get('/login', async (req, res) => {
   try {
-    console.log("render get users/login");
+    // console.log("render get users/login");
     res.render('users/login', { title: 'ProFolio Login Page'});
   }
   catch (e) {
-    console.log("error rendering users/login");
+    // console.log("error rendering users/login");
     res.status(500).json({ error: e});  // to-do: better error message
   }
 });
 
 //post users/login to log in user & create session.user info
 router.post('/login', async (req, res) => {
-  console.log("post users/login");
+  // console.log("post users/login");
   const { username, password } = req.body;
   let user = {};
   try {
     user = await users.getUserByUsername(username);
-    console.log(`user found with id: ${user._id}`)
-    console.log(user);
+    // console.log(`user found with id: ${user._id}`)
+    // console.log(user);
   }
   catch (e) {
-    console.log("no username found in /users/login");
+    // console.log("no username found in /users/login");
     return res.status(500).json({ error: e});  // to-do: better error message
   }
-  console.log(user.username);
+  // console.log(user.username);
   let match = {};
   try {
     match = await users.checkUser(username, password);  //checkUser throws error if passwords don't match
@@ -98,7 +98,7 @@ router.post('/login', async (req, res) => {
   // Redirecting to the user profile page after successful login
   }
   catch (e) {   // checkUser failed
-    console.log(`error from checkUser ${e}`);
+    // console.log(`error from checkUser ${e}`);
     return res.status(500).json({error: e});  // probably change this to 401 or 403 for unauathorized user
   }
 });
@@ -119,7 +119,7 @@ router.get('/profile', async (req, res) => {
     // Load full user from DB
     const fullUser = await users.getUserById(req.session?.user.userId);
     if (!fullUser) {
-      console.log('User not found for session id:', req.session?.user.userId);
+      // console.log('User not found for session id:', req.session?.user.userId);
       return res.status(404).render('error', { message: 'User not found' });
     }
 
@@ -156,7 +156,7 @@ router.get('/profile', async (req, res) => {
       userJson// <-- important
     });
   } catch (e) {
-    console.log("Error rendering user profile page:", e);
+    // console.log("Error rendering user profile page:", e);
     res.status(500).json({ error: e });
   }
 });

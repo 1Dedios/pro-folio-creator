@@ -1,0 +1,288 @@
+/* Page Layout */
+.portfolio-form {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  background-color: #FFFFFF;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+h1, h2 {
+  color: #1F2937;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+p {
+  text-align: center;
+  color: #4B5563;
+  margin-bottom: 2rem;
+}
+
+/* Form Elements */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #1F2937;
+}
+
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="url"],
+.form-group input[type="date"],
+.form-group textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #E5E7EB;
+  border-radius: 0.375rem;
+  font-family: inherit;
+  transition: border-color 0.2s ease;
+}
+
+.form-group input[type="text"]:focus,
+.form-group input[type="email"]:focus,
+.form-group input[type="url"]:focus,
+.form-group input[type="date"]:focus,
+.form-group textarea:focus {
+  border-color: #3B82F6;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.form-group input[type="checkbox"] {
+  margin-right: 0.5rem;
+}
+
+/* Checkbox group styling */
+.checkbox-group label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.checkbox-group input[type="checkbox"] {
+  margin: 0;
+  width: auto;
+  flex-shrink: 0;
+}
+
+.checkbox-group span {
+  margin: 0;
+  padding: 0;
+  display: inline-block;
+}
+
+/* Section Styling */
+.section {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  border: 1px solid #E5E7EB;
+  border-radius: 0.5rem;
+  background-color: #f8fafc;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.2s ease;
+}
+
+.section:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #E5E7EB;
+}
+
+.section-header h3 {
+  color: #3B82F6;
+  margin-bottom: 0;
+}
+
+.item-header {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+
+.section-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+  justify-content: center;
+}
+
+.section-items {
+  margin-bottom: 1.5rem;
+}
+
+.section-item {
+  margin-bottom: 1.5rem;
+  padding: 1.5rem;
+  background-color: #FFFFFF;
+  border-radius: 0.375rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.section-item hr {
+  margin: 1.5rem 0;
+  border: 0;
+  border-top: 1px solid #E5E7EB;
+}
+
+/* Buttons */
+.btn-primary, .btn-secondary {
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-primary {
+  background-color: #3B82F6;
+  color: #FFFFFF;
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: #2563EB;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-secondary {
+  background-color: #FFFFFF;
+  color: #3B82F6;
+  border: 1px solid #3B82F6;
+}
+
+.btn-secondary:hover {
+  background-color: #EFF6FF;
+  transform: translateY(-1px);
+}
+
+.btn-delete {
+  padding: 0.5rem 0.75rem;
+  font-weight: 600;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: inline-block;
+  background-color: #EF4444;
+  color: #FFFFFF;
+  border: none;
+  font-size: 0.875rem;
+}
+
+.btn-delete:hover {
+  background-color: #DC2626;
+  transform: translateY(-1px);
+}
+
+.delete-section {
+  margin-left: 1rem;
+}
+
+.delete-item {
+  margin-bottom: 0.5rem;
+}
+
+.btn-arrow {
+  padding: 0.3rem 0.5rem;
+  font-weight: 600;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: inline-block;
+  background-color: #3B82F6;
+  color: #FFFFFF;
+  border: none;
+  font-size: 0.875rem;
+  margin-right: 0.25rem;
+}
+
+.btn-arrow:hover {
+  background-color: #2563EB;
+  transform: translateY(-1px);
+}
+
+.section-controls, .item-controls {
+  display: flex;
+  align-items: center;
+}
+
+.page-selector {
+  margin-right: 10px;
+}
+
+.page-selector select {
+  padding: 0.3rem;
+  border: none;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+}
+
+.add-entry-btn {
+  margin: 1rem 0 1.5rem;
+  display: block;
+  width: auto;
+}
+
+button[type="submit"] {
+  display: block;
+  width: 100%;
+  max-width: 300px;
+  margin: 2rem auto 0;
+  padding: 1rem;
+  font-size: 1.1rem;
+}
+
+/* Quill Editor */
+.quill-editor {
+  height: 200px;
+  margin-bottom: 1.5rem;
+  border-radius: 0.375rem;
+}
+
+/* Error Message */
+.error-container {
+  background-color: #FEE2E2;
+  border: 1px solid #EF4444;
+  border-radius: 0.375rem;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.error-message {
+  color: #B91C1C;
+  margin-bottom: 0;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .portfolio-form {
+    padding: 1.5rem;
+  }
+
+  .section-buttons {
+    flex-direction: column;
+  }
+
+  .btn-secondary {
+    width: 100%;
+  }
+}

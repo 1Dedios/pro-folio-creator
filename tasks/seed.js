@@ -179,16 +179,6 @@ const main = async () => {
                         order: 2
                     }
                 ]
-            },
-            {
-                type: "custom",
-                items: [
-                    {
-                        title: "Awards & Recognition",
-                        content: "<p>Recipient of 2024 State Innovation Award for Open Source Contributions.</p><p>First place in the 2023 National Hackathon for Sustainable Technology.</p>",
-                        order: 1
-                    }
-                ]
             }
         ],
         { singlePage: true, pages: [] },

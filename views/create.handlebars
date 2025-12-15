@@ -12,6 +12,10 @@
 </div>
 {{/if}}
 
+{{#if portfolioJson}}
+<script id="portfolioJson" type="application/json">{{{portfolioJson}}}</script>
+{{/if}}
+
 <form action="{{#if portfolio}}/portfolio/{{portfolio._id}}/edit{{else}}/create{{/if}}" method="POST" class="portfolio-form">
   <div class="form-group">
     <label for="title">Title:<span>*</span></label>
@@ -522,60 +526,144 @@
     const portfolioJson = "{{portfolioJson}}";
     if (portfolioJson) {
       try {
-        console.log("[DEBUG_LOG] Starting to process portfolio JSON data");
-        console.log("[DEBUG_LOG] Raw portfolioJson:", portfolioJson);
+        // console.log("[DEBUG_LOG] Starting to process portfolio JSON data");
+        // console.log("[DEBUG_LOG] Raw portfolioJson:", portfolioJson);
         const portfolio = JSON.parse(portfolioJson.replace(/&quot;/g, '"'));
-        console.log("[DEBUG_LOG] Parsed portfolio object:", portfolio);
-        console.log("[DEBUG_LOG] Portfolio title:", portfolio.title);
-        console.log("[DEBUG_LOG] Portfolio description:", portfolio.description);
+                // No need to decode HTML entities in custom section content
+                // The content will be used directly by the Quill editor
+        // console.log("[DEBUG_LOG] Parsed portfolio object:", portfolio);
+        // console.log("[DEBUG_LOG] Portfolio title:", portfolio.title);
+        // console.log("[DEBUG_LOG] Portfolio description:", portfolio.description);
+        // console.log("[DEBUG_LOG] Portfolio layout:", portfolio.layout);
 
         if (portfolio && portfolio.sections) {
-          console.log("[DEBUG_LOG] Portfolio has sections array with length:", portfolio.sections.length);
+          // console.log("[DEBUG_LOG] Portfolio has sections array with length:", portfolio.sections.length);
           // Log each section type and its items
           portfolio.sections.forEach((section, i) => {
-            console.log(`[DEBUG_LOG] Processing section ${i}, type: ${section.type}, id: ${section._id}`);
-            console.log(`[DEBUG_LOG] Section ${i} has ${section.items ? section.items.length : 0} items`);
+            // console.log(`[DEBUG_LOG] Processing section ${i}, type: ${section.type}, id: ${section._id}`);
+            // console.log(`[DEBUG_LOG] Section ${i} has ${section.items ? section.items.length : 0} items`);
             if (section.items && section.items.length > 0) {
               section.items.forEach((item, j) => {
-                console.log(`[DEBUG_LOG] Section ${i}, Item ${j} data:`, JSON.stringify(item));
+                // console.log(`[DEBUG_LOG] Section ${i}, Item ${j} data:`, JSON.stringify(item));
               });
             }
           });
-          // Set multi-page layout checkbox if needed
-          if (portfolio.layout && !portfolio.layout.singlePage) {
-            document.getElementById('multiPageLayout').checked = true;
-            togglePageNamesSection();
 
-            // Add page names
-            if (portfolio.layout.pages && portfolio.layout.pages.length > 0) {
-              // First page is already there (Home)
-              document.getElementById('pageName0').value = portfolio.layout.pages[0].title;
-
-              // Add additional pages
-              for (let i = 1; i < portfolio.layout.pages.length; i++) {
-                addPageName();
-                document.getElementById(`pageName${i}`).value = portfolio.layout.pages[i].title;
-              }
+          // Log layout information
+          if (portfolio.layout) {
+            // console.log(`[DEBUG_LOG] Layout singlePage: ${portfolio.layout.singlePage}`);
+            if (portfolio.layout.pages) {
+              // console.log(`[DEBUG_LOG] Layout has ${portfolio.layout.pages.length} pages`);
+              portfolio.layout.pages.forEach((page, i) => {
+                // console.log(`[DEBUG_LOG] Page ${i}: title=${page.title}, sectionIds=${page.sectionIds ? page.sectionIds.map(id => id.toString()).join(', ') : 'none'}`);
+              });
             }
           }
 
+          // Set multi-page layout checkbox if needed
+          if (portfolio.layout && !portfolio.layout.singlePage) {
+            // console.log("[DEBUG_LOG] Setting multi-page layout checkbox");
+            // console.log("[DEBUG_LOG] Layout object:", JSON.stringify(portfolio.layout));
+
+            // Check if the multiPageLayout checkbox exists
+            const multiPageLayoutCheckbox = document.getElementById('multiPageLayout');
+            if (multiPageLayoutCheckbox) {
+              // console.log("[DEBUG_LOG] Found multiPageLayout checkbox, setting checked=true");
+              multiPageLayoutCheckbox.checked = true;
+              togglePageNamesSection();
+            } else {
+              console.error("[DEBUG_LOG] ERROR: multiPageLayout checkbox not found in the DOM");
+            }
+
+            // Add page names
+            if (portfolio.layout.pages && portfolio.layout.pages.length > 0) {
+              // console.log(`[DEBUG_LOG] Layout has ${portfolio.layout.pages.length} pages`);
+
+              // First page is already there (Home)
+              const pageName0Input = document.getElementById('pageName0');
+              if (pageName0Input) {
+                pageName0Input.value = portfolio.layout.pages[0].title;
+                // console.log(`[DEBUG_LOG] Set page 0 name to: ${portfolio.layout.pages[0].title}`);
+              } else {
+                console.error("[DEBUG_LOG] ERROR: pageName0 input not found in the DOM");
+              }
+
+              // Add additional pages
+              for (let i = 1; i < portfolio.layout.pages.length; i++) {
+                // console.log(`[DEBUG_LOG] Adding page ${i}`);
+                addPageName();
+
+                const pageNameInput = document.getElementById(`pageName${i}`);
+                if (pageNameInput) {
+                  pageNameInput.value = portfolio.layout.pages[i].title;
+                  // console.log(`[DEBUG_LOG] Set page ${i} name to: ${portfolio.layout.pages[i].title}`);
+                } else {
+                  console.error(`[DEBUG_LOG] ERROR: pageName${i} input not found in the DOM`);
+                }
+              }
+            }
+          } else {
+            // console.log("[DEBUG_LOG] Not setting multi-page layout checkbox because layout.singlePage is true or layout is undefined");
+            // console.log("[DEBUG_LOG] Layout value:", JSON.stringify(portfolio.layout));
+          }
+
           // First, add all sections to the DOM
-          console.log("[DEBUG_LOG] First phase: Adding all sections to the DOM");
+          // console.log("[DEBUG_LOG] First phase: Adding all sections to the DOM");
+          // console.log("[DEBUG_LOG] Number of sections:", portfolio.sections.length);
+
+          // Check if sections array is valid
+          if (!Array.isArray(portfolio.sections)) {
+            console.error("[DEBUG_LOG] ERROR: portfolio.sections is not an array:", portfolio.sections);
+            return;
+          }
+
           const sectionsData = [];
 
-          portfolio.sections.forEach(section => {
-            if (section.type) {
-              console.log(`[DEBUG_LOG] Adding section of type: ${section.type}`);
+          portfolio.sections.forEach((section, index) => {
+            // console.log(`[DEBUG_LOG] Processing section ${index}:`, JSON.stringify(section));
+
+            if (!section) {
+              console.error(`[DEBUG_LOG] ERROR: Section ${index} is null or undefined`);
+              return;
+            }
+
+            if (!section.type) {
+              console.error(`[DEBUG_LOG] ERROR: Section ${index} has no type:`, JSON.stringify(section));
+              return;
+            }
+
+            // console.log(`[DEBUG_LOG] Adding section of type: ${section.type}, id: ${section._id}`);
+
+            try {
               addSection(section.type);
+              // console.log(`[DEBUG_LOG] Successfully added section of type: ${section.type}`);
 
               // Get the section container that was just added
               const sectionContainer = document.getElementById(`section-${sectionIndex - 1}`);
 
+              if (!sectionContainer) {
+                console.error(`[DEBUG_LOG] ERROR: Section container with id section-${sectionIndex - 1} not found in the DOM`);
+                return;
+              }
+
+              // console.log(`[DEBUG_LOG] Created section container with id: section-${sectionIndex - 1}`);
+
               // Store the section ID for later use if it exists
               if (section._id) {
-                sectionContainer.dataset.sectionId = section._id.toString();
+                // For copied example portfolios, we need to use the new section ID from the sectionIdMap
+                const sectionId = section._id.toString();
+
+                // Add a hidden input with the section ID
+                const sectionIdInput = document.createElement('input');
+                sectionIdInput.type = 'hidden';
+                sectionIdInput.name = `sections[${sectionIndex - 1}][_id]`;
+                sectionIdInput.value = sectionId;
+                sectionContainer.appendChild(sectionIdInput);
+
+                sectionContainer.dataset.sectionId = sectionId;
+                // console.log(`[DEBUG_LOG] Set section container dataset.sectionId to: ${sectionId}`);
               } else {
-                console.log(`[DEBUG_LOG] Section has no _id, skipping dataset assignment`);
+                // console.log(`[DEBUG_LOG] Section has no _id, skipping dataset assignment`);
               }
 
               // Store section data for later processing
@@ -584,40 +672,73 @@
                 sectionContainer: sectionContainer,
                 sectionIndex: sectionIndex - 1
               });
+              // console.log(`[DEBUG_LOG] Stored section data for later processing, sectionIndex: ${sectionIndex - 1}`);
 
               // If this section has items, add them
               if (section.items && Array.isArray(section.items)) {
+                // console.log(`[DEBUG_LOG] Section has ${section.items.length} items`);
+
                 // The first item is already added by addSection, so we start from the second item
                 for (let i = 1; i < section.items.length; i++) {
-                  addEntry(`section-${sectionIndex - 1}`);
+                  // console.log(`[DEBUG_LOG] Adding additional item ${i} to section-${sectionIndex - 1}`);
+                  try {
+                    addEntry(`section-${sectionIndex - 1}`);
+                    // console.log(`[DEBUG_LOG] Successfully added item ${i} to section-${sectionIndex - 1}`);
+                  } catch (error) {
+                    console.error(`[DEBUG_LOG] ERROR: Failed to add item ${i} to section-${sectionIndex - 1}:`, error);
+                  }
                 }
+              } else {
+                // console.log(`[DEBUG_LOG] Section has no items or items is not an array:`, section.items);
               }
+            } catch (error) {
+              console.error(`[DEBUG_LOG] ERROR: Failed to add section of type ${section.type}:`, error);
             }
           });
 
           // After all sections are added to the DOM, populate their values
-          console.log("[DEBUG_LOG] Second phase: Populating all sections with values");
+          // console.log("[DEBUG_LOG] Second phase: Populating all sections with values");
+          // console.log("[DEBUG_LOG] Number of sections to populate:", sectionsData.length);
+
           setTimeout(() => {
-            sectionsData.forEach(({ section, sectionContainer, sectionIndex }) => {
-              console.log(`[DEBUG_LOG] Populating section of type: ${section.type}`);
+            sectionsData.forEach(({ section, sectionContainer, sectionIndex }, dataIndex) => {
+              // console.log(`[DEBUG_LOG] Populating section ${dataIndex} of type: ${section.type}, id: ${section._id}`);
+
+              if (!sectionContainer) {
+                console.error(`[DEBUG_LOG] ERROR: Section container is null or undefined for section ${dataIndex}`);
+                return;
+              }
+
+              // console.log(`[DEBUG_LOG] Section container exists with id: ${sectionContainer.id}`);
 
               // If this section has items, populate them
               if (section.items && Array.isArray(section.items)) {
-                const itemsContainer = sectionContainer.querySelector('.section-items');
-                if (!itemsContainer) {
-                  console.error(`[DEBUG_LOG] ERROR: Items container not found for section ${section.type}`);
-                  console.error(`[DEBUG_LOG] Section container:`, sectionContainer);
-                  console.error(`[DEBUG_LOG] Section container HTML:`, sectionContainer.outerHTML);
-                  return;
+                // console.log(`[DEBUG_LOG] Section has ${section.items.length} items to populate`);
+
+                // For custom sections, the structure is different - there's no .section-items container
+                let itemsContainer;
+                if (section.type === 'custom') {
+                  // For custom sections, use the section container itself to find .section-item
+                  itemsContainer = sectionContainer;
+                  // console.log(`[DEBUG_LOG] Using section container as items container for custom section`);
+                } else {
+                  // For other section types, find the .section-items container
+                  itemsContainer = sectionContainer.querySelector('.section-items');
+                  if (!itemsContainer) {
+                    console.error(`[DEBUG_LOG] ERROR: Items container not found for section ${section.type}`);
+                    console.error(`[DEBUG_LOG] Section container id: ${sectionContainer.id}`);
+                    console.error(`[DEBUG_LOG] Section container HTML:`, sectionContainer.outerHTML);
+                    return;
+                  }
+                  // console.log(`[DEBUG_LOG] Found items container for section ${section.type}`);
                 }
-                console.log(`[DEBUG_LOG] Found items container for section ${section.type}:`, itemsContainer);
 
                 const itemElements = itemsContainer.querySelectorAll('.section-item');
-                console.log(`[DEBUG_LOG] Found ${itemElements.length} item elements for section ${section.type}`);
+                // console.log(`[DEBUG_LOG] Found ${itemElements.length} item elements for section ${section.type}`);
 
                 if (itemElements.length === 0) {
                   console.error(`[DEBUG_LOG] ERROR: No item elements found for section ${section.type}`);
-                  console.log(`[DEBUG_LOG] Items container HTML:`, itemsContainer.outerHTML);
+                  // console.log(`[DEBUG_LOG] Items container HTML:`, itemsContainer.outerHTML);
                 }
 
                 if (section.items.length > itemElements.length) {
@@ -625,35 +746,49 @@
                 }
 
                 section.items.forEach((item, itemIndex) => {
-                  console.log(`[DEBUG_LOG] Processing section ${section.type}, Item ${itemIndex}:`, JSON.stringify(item));
+                  // console.log(`[DEBUG_LOG] Processing section ${section.type}, Item ${itemIndex}`);
+
+                  if (!item) {
+                    console.error(`[DEBUG_LOG] ERROR: Item ${itemIndex} is null or undefined`);
+                    return;
+                  }
+
+                  // console.log(`[DEBUG_LOG] Item ${itemIndex} data:`, JSON.stringify(item));
 
                   if (itemIndex < itemElements.length) {
                     const itemElement = itemElements[itemIndex];
-                    console.log(`[DEBUG_LOG] Found item element for ${section.type}, Item ${itemIndex}:`, itemElement);
+
+                    if (!itemElement) {
+                      console.error(`[DEBUG_LOG] ERROR: Item element ${itemIndex} is null or undefined`);
+                      return;
+                    }
+
+                    // console.log(`[DEBUG_LOG] Found item element for ${section.type}, Item ${itemIndex}`);
+                    // console.log(`[DEBUG_LOG] Found item element for ${section.type}, Item ${itemIndex}:`, itemElement);
 
                     // Store the item ID for later use if it exists
                     if (item._id) {
                       itemElement.dataset.itemId = item._id.toString();
-                      console.log(`[DEBUG_LOG] Set item ID: ${item._id.toString()} on element`);
+                      // console.log(`[DEBUG_LOG] Set item ID: ${item._id.toString()} on element`);
                     } else {
-                      console.log(`[DEBUG_LOG] Item has no _id, skipping dataset assignment`);
+                      // console.log(`[DEBUG_LOG] Item has no _id, skipping dataset assignment`);
                     }
 
                     // Populate all inputs and textareas in this item
                     const inputs = itemElement.querySelectorAll('input:not([type="hidden"]), textarea');
-                    console.log(`[DEBUG_LOG] Found ${inputs.length} inputs/textareas for ${section.type}, Item ${itemIndex}`);
+                    // console.log(`[DEBUG_LOG] Found ${inputs.length} inputs/textareas for ${section.type}, Item ${itemIndex}`);
 
                     if (inputs.length === 0) {
-                      console.error(`[DEBUG_LOG] ERROR: No input elements found for section ${section.type}, item ${itemIndex}`);
-                      console.log(`[DEBUG_LOG] Item element HTML:`, itemElement.outerHTML);
+                      // console.error(`[DEBUG_LOG] ERROR: No input elements found for section ${section.type}, item ${itemIndex}`);
+                      // console.log(`[DEBUG_LOG] Item element HTML:`, itemElement.outerHTML);
                     }
 
                     inputs.forEach(input => {
                       const name = input.getAttribute('name');
-                      console.log(`[DEBUG_LOG] Processing input: name=${name}, type=${input.type}, tagName=${input.tagName}`);
+                      // console.log(`[DEBUG_LOG] Processing input: name=${name}, type=${input.type}, tagName=${input.tagName}`);
 
                       if (!name) {
-                        console.warn(`[DEBUG_LOG] WARNING: Input has no name attribute:`, input);
+                        // console.warn(`[DEBUG_LOG] WARNING: Input has no name attribute:`, input);
                         return;
                       }
 
@@ -663,22 +798,22 @@
                         // We need to extract the last part (fieldName)
                         const matches = name.match(/\[([^\]]+)\]$/);
                         const fieldName = matches ? matches[1] : '';
-                        console.log(`[DEBUG_LOG] Extracted field name: ${fieldName}, value in item: ${JSON.stringify(item[fieldName])}`);
+                        // console.log(`[DEBUG_LOG] Extracted field name: ${fieldName}, value in item: ${JSON.stringify(item[fieldName])}`);
 
                         if (item[fieldName] !== undefined) {
-                          console.log(`[DEBUG_LOG] Setting value for field ${fieldName} to ${JSON.stringify(item[fieldName])}`);
+                          // console.log(`[DEBUG_LOG] Setting value for field ${fieldName} to ${JSON.stringify(item[fieldName])}`);
 
                           // Handle special cases
                           if (fieldName === 'achievements' && Array.isArray(item[fieldName])) {
                             const value = item[fieldName].join('\n');
-                            console.log(`[DEBUG_LOG] Setting achievements value: ${value}`);
+                            // console.log(`[DEBUG_LOG] Setting achievements value: ${value}`);
                             input.value = value;
-                            console.log(`[DEBUG_LOG] After setting, achievements value is: ${input.value}`);
+                            // console.log(`[DEBUG_LOG] After setting, achievements value is: ${input.value}`);
                           } else if (fieldName === 'technologies' && Array.isArray(item[fieldName])) {
                             const value = item[fieldName].join(', ');
-                            console.log(`[DEBUG_LOG] Setting technologies value: ${value}`);
+                            // console.log(`[DEBUG_LOG] Setting technologies value: ${value}`);
                             input.value = value;
-                            console.log(`[DEBUG_LOG] After setting, technologies value is: ${input.value}`);
+                            // console.log(`[DEBUG_LOG] After setting, technologies value is: ${input.value}`);
                           } else if (fieldName.includes('Date') && item[fieldName]) {
                             // Format date as YYYY-MM-DD for input[type="date"]
                             const date = new Date(item[fieldName]);
@@ -686,71 +821,97 @@
                             const month = String(date.getMonth() + 1).padStart(2, '0');
                             const day = String(date.getDate()).padStart(2, '0');
                             const formattedDate = `${year}-${month}-${day}`;
-                            console.log(`[DEBUG_LOG] Setting date value: ${formattedDate}`);
+                            // console.log(`[DEBUG_LOG] Setting date value: ${formattedDate}`);
                             input.value = formattedDate;
-                            console.log(`[DEBUG_LOG] After setting, date value is: ${input.value}`);
+                            // console.log(`[DEBUG_LOG] After setting, date value is: ${input.value}`);
                           } else if (input.tagName === 'TEXTAREA') {
-                            console.log(`[DEBUG_LOG] Setting textarea value using multiple methods`);
+                            // console.log(`[DEBUG_LOG] Setting textarea value using multiple methods`);
                             // Try multiple approaches to set textarea value
-                            console.log(`[DEBUG_LOG] Before setting: defaultValue=${input.defaultValue}, value=${input.value}, innerHTML=${input.innerHTML}`);
+                            // console.log(`[DEBUG_LOG] Before setting: defaultValue=${input.defaultValue}, value=${input.value}, innerHTML=${input.innerHTML}`);
 
                             input.defaultValue = item[fieldName];
-                            console.log(`[DEBUG_LOG] After setting defaultValue: ${input.defaultValue}`);
+                            // console.log(`[DEBUG_LOG] After setting defaultValue: ${input.defaultValue}`);
 
                             input.value = item[fieldName];
-                            console.log(`[DEBUG_LOG] After setting value: ${input.value}`);
+                            // console.log(`[DEBUG_LOG] After setting value: ${input.value}`);
 
                             input.innerHTML = item[fieldName];
-                            console.log(`[DEBUG_LOG] After setting innerHTML: ${input.innerHTML}`);
+                            // console.log(`[DEBUG_LOG] After setting innerHTML: ${input.innerHTML}`);
 
                             input.innerText = item[fieldName];
-                            console.log(`[DEBUG_LOG] After setting innerText: ${input.innerText}`);
+                            // console.log(`[DEBUG_LOG] After setting innerText: ${input.innerText}`);
 
                             // Force a change event to ensure the value is set
                             const event = new Event('change', { bubbles: true });
                             input.dispatchEvent(event);
-                            console.log(`[DEBUG_LOG] Dispatched change event`);
+                            // console.log(`[DEBUG_LOG] Dispatched change event`);
 
                             // Final check
-                            console.log(`[DEBUG_LOG] Final textarea state: defaultValue=${input.defaultValue}, value=${input.value}, innerHTML=${input.innerHTML}`);
+                            // console.log(`[DEBUG_LOG] Final textarea state: defaultValue=${input.defaultValue}, value=${input.value}, innerHTML=${input.innerHTML}`);
                           } else {
-                            console.log(`[DEBUG_LOG] Setting regular input value: ${item[fieldName]}`);
+                            // console.log(`[DEBUG_LOG] Setting regular input value: ${item[fieldName]}`);
                             input.value = item[fieldName];
-                            console.log(`[DEBUG_LOG] After setting, input value is: ${input.value}`);
+                            // console.log(`[DEBUG_LOG] After setting, input value is: ${input.value}`);
                           }
 
                           // Verify the value was set correctly
                           if (input.value !== item[fieldName] && 
                               !(Array.isArray(item[fieldName])) && 
                               !(fieldName.includes('Date'))) {
-                            console.warn(`[DEBUG_LOG] WARNING: Value mismatch after setting. Expected: ${item[fieldName]}, Actual: ${input.value}`);
+                            // console.warn(`[DEBUG_LOG] WARNING: Value mismatch after setting. Expected: ${item[fieldName]}, Actual: ${input.value}`);
                           }
                         } else {
-                          console.log(`[DEBUG_LOG] Field ${fieldName} not found in item data`);
+                          // console.log(`[DEBUG_LOG] Field ${fieldName} not found in item data`);
                         }
                       } catch (error) {
-                        console.error(`[DEBUG_LOG] ERROR processing field: ${error.message}`, error);
+                        // console.error(`[DEBUG_LOG] ERROR processing field: ${error.message}`, error);
                       }
                     });
                   } else {
-                    console.error(`[DEBUG_LOG] ERROR: Item index ${itemIndex} is out of bounds (only ${itemElements.length} elements available)`);
+                    // console.error(`[DEBUG_LOG] ERROR: Item index ${itemIndex} is out of bounds (only ${itemElements.length} elements available)`);
                   }
                 });
               }
 
-              // If this is a custom section, initialize the Quill editor with the content
+              // If this is a custom section, set the content value but don't initialize Quill yet
+              // The Quill editor will be initialized by the addSection function
               if (section.type === 'custom' && section.items && section.items[0] && section.items[0].content) {
-                const editorId = `editor-${sectionIndex}`;
                 const contentId = `content-${sectionIndex}`;
-
                 const contentInput = document.getElementById(contentId);
                 if (contentInput) {
                   contentInput.value = section.items[0].content;
 
-                  // If Quill is initialized, set its content
-                  if (quillEditors[sectionIndex]) {
-                    quillEditors[sectionIndex].root.innerHTML = section.items[0].content;
-                  }
+                  // Set the content after ensuring the editor is initialized
+                  // This will be done after all sections are added to the DOM
+                  setTimeout(() => {
+                    if (quillEditors[sectionIndex]) {
+                      // Use clipboard.dangerouslyPasteHTML directly with the content
+                      // No need for temporary div which causes HTML tags to be displayed as text
+                      quillEditors[sectionIndex].clipboard.dangerouslyPasteHTML(0, section.items[0].content);
+                    } else {
+                      // console.log(`[DEBUG_LOG] Quill editor not found for section ${sectionIndex}, trying again in 500ms`);
+                      // Try again after a longer delay if the editor is not initialized yet
+                      setTimeout(() => {
+                        if (quillEditors[sectionIndex]) {
+                          // Use content directly without temporary div
+                          quillEditors[sectionIndex].clipboard.dangerouslyPasteHTML(0, section.items[0].content);
+                          // console.log(`[DEBUG_LOG] Successfully set content for section ${sectionIndex} on second attempt`);
+                        } else {
+                          // console.error(`[DEBUG_LOG] ERROR: Quill editor still not found for section ${sectionIndex} after second attempt, trying one more time`);
+                          // Try one more time with an even longer delay
+                          setTimeout(() => {
+                            if (quillEditors[sectionIndex]) {
+                              // Use content directly without temporary div
+                              quillEditors[sectionIndex].clipboard.dangerouslyPasteHTML(0, section.items[0].content);
+                              // console.log(`[DEBUG_LOG] Successfully set content for section ${sectionIndex} on third attempt`);
+                            } else {
+                              // console.error(`[DEBUG_LOG] ERROR: Quill editor still not found for section ${sectionIndex} after third attempt. Giving up.`);
+                            }
+                          }, 1000);
+                        }
+                      }, 500);
+                    }
+                  }, 500); // Delay to ensure editor is initialized
                 }
               }
             });
@@ -775,7 +936,7 @@
           }
         }
       } catch (e) {
-        console.error("Error parsing portfolio data:", e);
+        // console.error("Error parsing portfolio data:", e);
       }
     } 
     // If no portfolio data, try to recreate from form data (for error cases)
@@ -784,6 +945,8 @@
       if (formDataJson) {
         try {
           const formData = JSON.parse(formDataJson.replace(/&quot;/g, '"'));
+                    // No need to decode HTML entities in custom section content
+                    // The content will be used directly by the Quill editor
           if (formData && formData.sections) {
             const sectionsData = Array.isArray(formData.sections) ? formData.sections : [formData.sections];
 
@@ -804,108 +967,117 @@
 
                   // Now populate all items with their values
                   // Add a small delay to ensure the DOM is fully updated
-                  console.log(`[DEBUG_LOG] Setting timeout to populate items for form data section ${section.type}`);
+                  // console.log(`[DEBUG_LOG] Setting timeout to populate items for form data section ${section.type}`);
                   setTimeout(() => {
-                    console.log(`[DEBUG_LOG] Timeout fired for form data, starting to populate items for section ${section.type}`);
+                    // console.log(`[DEBUG_LOG] Timeout fired for form data, starting to populate items for section ${section.type}`);
 
-                    const itemsContainer = sectionContainer.querySelector('.section-items');
-                    if (!itemsContainer) {
-                      console.error(`[DEBUG_LOG] ERROR: Items container not found for form data section ${section.type}`);
-                      console.error(`[DEBUG_LOG] Form data section container:`, sectionContainer);
-                      console.error(`[DEBUG_LOG] Form data section container HTML:`, sectionContainer.outerHTML);
-                      return;
+                    // For custom sections, the structure is different - there's no .section-items container
+                    let itemsContainer;
+                    if (section.type === 'custom') {
+                      // For custom sections, use the section container itself to find .section-item
+                      itemsContainer = sectionContainer;
+                      console.log(`[DEBUG_LOG] Using section container as items container for form data custom section`);
+                    } else {
+                      // For other section types, find the .section-items container
+                      itemsContainer = sectionContainer.querySelector('.section-items');
+                      if (!itemsContainer) {
+                        console.error(`[DEBUG_LOG] ERROR: Items container not found for form data section ${section.type}`);
+                        console.error(`[DEBUG_LOG] Form data section container id: ${sectionContainer.id}`);
+                        console.error(`[DEBUG_LOG] Form data section container HTML:`, sectionContainer.outerHTML);
+                        return;
+                      }
+                      // console.log(`[DEBUG_LOG] Found items container for form data section ${section.type}`);
                     }
-                    console.log(`[DEBUG_LOG] Found items container for form data section ${section.type}:`, itemsContainer);
 
                     const itemElements = itemsContainer.querySelectorAll('.section-item');
-                    console.log(`[DEBUG_LOG] Found ${itemElements.length} item elements for form data section ${section.type}`);
+                    // console.log(`[DEBUG_LOG] Found ${itemElements.length} item elements for form data section ${section.type}`);
 
                     if (itemElements.length === 0) {
-                      console.error(`[DEBUG_LOG] ERROR: No item elements found for form data section ${section.type}`);
-                      console.log(`[DEBUG_LOG] Form data items container HTML:`, itemsContainer.outerHTML);
+                      // console.error(`[DEBUG_LOG] ERROR: No item elements found for form data section ${section.type}`);
+                      // console.log(`[DEBUG_LOG] Form data items container HTML:`, itemsContainer.outerHTML);
                     }
 
                     if (section.items.length > itemElements.length) {
-                      console.warn(`[DEBUG_LOG] WARNING: Form data section has ${section.items.length} items but only ${itemElements.length} item elements were found`);
+                      // console.warn(`[DEBUG_LOG] WARNING: Form data section has ${section.items.length} items but only ${itemElements.length} item elements were found`);
                     }
 
                     section.items.forEach((item, itemIndex) => {
-                      console.log(`[DEBUG_LOG] Processing form data section ${section.type}, Item ${itemIndex}:`, JSON.stringify(item));
+                      // console.log(`[DEBUG_LOG] Processing form data section ${section.type}, Item ${itemIndex}:`, JSON.stringify(item));
 
                       if (itemIndex < itemElements.length) {
                         const itemElement = itemElements[itemIndex];
-                        console.log(`[DEBUG_LOG] Found form data item element for ${section.type}, Item ${itemIndex}:`, itemElement);
+                        // console.log(`[DEBUG_LOG] Found form data item element for ${section.type}, Item ${itemIndex}:`, itemElement);
 
                         // Populate all inputs and textareas in this item
                         const inputs = itemElement.querySelectorAll('input:not([type="hidden"]), textarea');
-                        console.log(`[DEBUG_LOG] Found ${inputs.length} inputs/textareas for form data ${section.type}, Item ${itemIndex}`);
+                        // console.log(`[DEBUG_LOG] Found ${inputs.length} inputs/textareas for form data ${section.type}, Item ${itemIndex}`);
 
                         if (inputs.length === 0) {
-                          console.error(`[DEBUG_LOG] ERROR: No input elements found for form data section ${section.type}, item ${itemIndex}`);
-                          console.log(`[DEBUG_LOG] Form data item element HTML:`, itemElement.outerHTML);
+                          // console.error(`[DEBUG_LOG] ERROR: No input elements found for form data section ${section.type}, item ${itemIndex}`);
+                          // console.log(`[DEBUG_LOG] Form data item element HTML:`, itemElement.outerHTML);
                         }
 
                         inputs.forEach(input => {
                           const name = input.getAttribute('name');
-                          console.log(`[DEBUG_LOG] Processing form data input: name=${name}, type=${input.type}, tagName=${input.tagName}`);
+                          // console.log(`[DEBUG_LOG] Processing form data input: name=${name}, type=${input.type}, tagName=${input.tagName}`);
 
                           if (!name) {
-                            console.warn(`[DEBUG_LOG] WARNING: Form data input has no name attribute:`, input);
+                            // console.warn(`[DEBUG_LOG] WARNING: Form data input has no name attribute:`, input);
                             return;
                           }
 
                           try {
                             const fieldName = name.split(']').pop().replace('[', '').replace(']', '');
-                            console.log(`[DEBUG_LOG] Extracted form data field name: ${fieldName}, value in item: ${JSON.stringify(item[fieldName])}`);
+                            // console.log(`[DEBUG_LOG] Extracted form data field name: ${fieldName}, value in item: ${JSON.stringify(item[fieldName])}`);
 
                             if (item[fieldName] !== undefined) {
-                              console.log(`[DEBUG_LOG] Setting form data value for field ${fieldName} to ${JSON.stringify(item[fieldName])}`);
+                              // console.log(`[DEBUG_LOG] Setting form data value for field ${fieldName} to ${JSON.stringify(item[fieldName])}`);
 
                               if (input.tagName === 'TEXTAREA') {
-                                console.log(`[DEBUG_LOG] Setting form data textarea value using multiple methods`);
+                                // console.log(`[DEBUG_LOG] Setting form data textarea value using multiple methods`);
                                 // Try multiple approaches to set textarea value
-                                console.log(`[DEBUG_LOG] Before setting form data: defaultValue=${input.defaultValue}, value=${input.value}, innerHTML=${input.innerHTML}`);
+                                // console.log(`[DEBUG_LOG] Before setting form data: defaultValue=${input.defaultValue}, value=${input.value}, innerHTML=${input.innerHTML}`);
 
                                 input.defaultValue = item[fieldName];
-                                console.log(`[DEBUG_LOG] After setting form data defaultValue: ${input.defaultValue}`);
+                                // console.log(`[DEBUG_LOG] After setting form data defaultValue: ${input.defaultValue}`);
 
                                 input.value = item[fieldName];
-                                console.log(`[DEBUG_LOG] After setting form data value: ${input.value}`);
+                                // console.log(`[DEBUG_LOG] After setting form data value: ${input.value}`);
 
                                 input.innerHTML = item[fieldName];
-                                console.log(`[DEBUG_LOG] After setting form data innerHTML: ${input.innerHTML}`);
+                                // console.log(`[DEBUG_LOG] After setting form data innerHTML: ${input.innerHTML}`);
 
                                 input.innerText = item[fieldName];
-                                console.log(`[DEBUG_LOG] After setting form data innerText: ${input.innerText}`);
+                                // console.log(`[DEBUG_LOG] After setting form data innerText: ${input.innerText}`);
 
                                 // Force a change event to ensure the value is set
                                 const event = new Event('change', { bubbles: true });
                                 input.dispatchEvent(event);
-                                console.log(`[DEBUG_LOG] Dispatched form data change event`);
+                                // console.log(`[DEBUG_LOG] Dispatched form data change event`);
 
                                 // Final check
-                                console.log(`[DEBUG_LOG] Final form data textarea state: defaultValue=${input.defaultValue}, value=${input.value}, innerHTML=${input.innerHTML}`);
+                                // console.log(`[DEBUG_LOG] Final form data textarea state: defaultValue=${input.defaultValue}, value=${input.value}, innerHTML=${input.innerHTML}`);
                               } else {
-                                console.log(`[DEBUG_LOG] Setting form data regular input value: ${item[fieldName]}`);
+                                // console.log(`[DEBUG_LOG] Setting form data regular input value: ${item[fieldName]}`);
                                 input.value = item[fieldName];
-                                console.log(`[DEBUG_LOG] After setting, form data input value is: ${input.value}`);
+                                // console.log(`[DEBUG_LOG] After setting, form data input value is: ${input.value}`);
                               }
 
                               // Verify the value was set correctly
                               if (input.value !== item[fieldName] && 
                                   !(Array.isArray(item[fieldName])) && 
                                   !(fieldName.includes('Date'))) {
-                                console.warn(`[DEBUG_LOG] WARNING: Form data value mismatch after setting. Expected: ${item[fieldName]}, Actual: ${input.value}`);
+                                // console.warn(`[DEBUG_LOG] WARNING: Form data value mismatch after setting. Expected: ${item[fieldName]}, Actual: ${input.value}`);
                               }
                             } else {
-                              console.log(`[DEBUG_LOG] Form data field ${fieldName} not found in item data`);
+                              // console.log(`[DEBUG_LOG] Form data field ${fieldName} not found in item data`);
                             }
                           } catch (error) {
-                            console.error(`[DEBUG_LOG] ERROR processing form data field: ${error.message}`, error);
+                            // console.error(`[DEBUG_LOG] ERROR processing form data field: ${error.message}`, error);
                           }
                         });
                       } else {
-                        console.error(`[DEBUG_LOG] ERROR: Form data item index ${itemIndex} is out of bounds (only ${itemElements.length} elements available)`);
+                        // console.error(`[DEBUG_LOG] ERROR: Form data item index ${itemIndex} is out of bounds (only ${itemElements.length} elements available)`);
                       }
                     });
                   }, 100); // 100ms delay
@@ -921,38 +1093,65 @@
                     if (contentInput) {
                       contentInput.value = section.items[0].content;
 
-                      // If Quill is initialized, set its content
+                      // Don't initialize Quill editor here
+                      // The Quill editor will be initialized by the addSection function
                       const editorIndex = sectionIndex - 1;
+
+                      // Set the content after ensuring the editor is initialized
                       if (quillEditors[editorIndex]) {
-                        quillEditors[editorIndex].root.innerHTML = section.items[0].content;
+                        // Use clipboard.dangerouslyPasteHTML directly with the content
+                        // No need for temporary div which causes HTML tags to be displayed as text
+                        quillEditors[editorIndex].clipboard.dangerouslyPasteHTML(0, section.items[0].content);
+                      } else {
+                        console.log(`[DEBUG_LOG] Quill editor not found for editor index ${editorIndex}, trying again in 500ms`);
+                        // Try again after a longer delay if the editor is not initialized yet
+                        setTimeout(() => {
+                          if (quillEditors[editorIndex]) {
+                            // Use content directly without temporary div
+                            quillEditors[editorIndex].clipboard.dangerouslyPasteHTML(0, section.items[0].content);
+                            console.log(`[DEBUG_LOG] Successfully set content for editor index ${editorIndex} on second attempt`);
+                          } else {
+                            console.error(`[DEBUG_LOG] ERROR: Quill editor still not found for editor index ${editorIndex} after second attempt, trying one more time`);
+                            // Try one more time with an even longer delay
+                            setTimeout(() => {
+                              if (quillEditors[editorIndex]) {
+                                // Use content directly without temporary div
+                                quillEditors[editorIndex].clipboard.dangerouslyPasteHTML(0, section.items[0].content);
+                                console.log(`[DEBUG_LOG] Successfully set content for editor index ${editorIndex} on third attempt`);
+                              } else {
+                                console.error(`[DEBUG_LOG] ERROR: Quill editor still not found for editor index ${editorIndex} after third attempt. Giving up.`);
+                              }
+                            }, 1000);
+                          }
+                        }, 500);
                       }
                     }
-                  }, 100);
+                  }, 500); // Increased delay to ensure editor is initialized
                 }
               }
             });
           }
         } catch (e) {
-          console.error("Error parsing form data:", e);
+          // console.error("Error parsing form data:", e);
         }
       }
     }
   };
 
   function addSection(type) {
-    console.log(`[DEBUG_LOG] Adding section of type: ${type}, section index: ${sectionIndex}`);
+    // console.log(`[DEBUG_LOG] Adding section of type: ${type}, section index: ${sectionIndex}`);
     const container = document.getElementById('sections-container');
     if (!container) {
-      console.error(`[DEBUG_LOG] ERROR: sections-container not found!`);
+      // console.error(`[DEBUG_LOG] ERROR: sections-container not found!`);
       return;
     }
-    console.log(`[DEBUG_LOG] Found sections container:`, container);
+    // console.log(`[DEBUG_LOG] Found sections container:`, container);
 
     const template = document.getElementById(`${type}-template`);
-    console.log(`[DEBUG_LOG] Template for ${type}:`, template);
+    // console.log(`[DEBUG_LOG] Template for ${type}:`, template);
 
     if (!template) {
-      console.error(`[DEBUG_LOG] ERROR: Template not found for type: ${type}`);
+      // console.error(`[DEBUG_LOG] ERROR: Template not found for type: ${type}`);
       return;
     }
 
@@ -960,17 +1159,17 @@
     let div;
 
     try {
-      console.log(`[DEBUG_LOG] Cloning template for ${type}...`);
+      // console.log(`[DEBUG_LOG] Cloning template for ${type}...`);
       const clone = document.importNode(template.content, true);
-      console.log(`[DEBUG_LOG] Successfully cloned template content:`, clone);
+      // console.log(`[DEBUG_LOG] Successfully cloned template content:`, clone);
 
       // Create a temporary div to hold the cloned content
       const tempDiv = document.createElement('div');
       tempDiv.appendChild(clone);
-      console.log(`[DEBUG_LOG] Added clone to temporary div`);
+      // console.log(`[DEBUG_LOG] Added clone to temporary div`);
 
       // Replace {index} placeholders with actual index
-      console.log(`[DEBUG_LOG] Replacing {index} placeholders with ${sectionIndex}`);
+      // console.log(`[DEBUG_LOG] Replacing {index} placeholders with ${sectionIndex}`);
       const html = tempDiv.innerHTML.replace(/{index}/g, sectionIndex);
 
       div = document.createElement('div');
@@ -978,27 +1177,27 @@
       div.id = `section-${sectionIndex}`;
       div.dataset.type = type;
       div.dataset.sectionIndex = sectionIndex;
-      console.log(`[DEBUG_LOG] Created section div with id: ${div.id}, type: ${div.dataset.type}`);
+      // console.log(`[DEBUG_LOG] Created section div with id: ${div.id}, type: ${div.dataset.type}`);
 
-      console.log(`[DEBUG_LOG] Adding section to container. Container children before: ${container.children.length}`);
+      // console.log(`[DEBUG_LOG] Adding section to container. Container children before: ${container.children.length}`);
       container.appendChild(div);
-      console.log(`[DEBUG_LOG] Section added. Container children after: ${container.children.length}`);
+      // console.log(`[DEBUG_LOG] Section added. Container children after: ${container.children.length}`);
 
       // Verify the section was added correctly
       const addedSection = document.getElementById(`section-${sectionIndex}`);
       if (addedSection) {
-        console.log(`[DEBUG_LOG] Section was successfully added to DOM with id: ${addedSection.id}`);
+        // console.log(`[DEBUG_LOG] Section was successfully added to DOM with id: ${addedSection.id}`);
       } else {
-        console.error(`[DEBUG_LOG] ERROR: Section was not found in DOM after adding!`);
+        // console.error(`[DEBUG_LOG] ERROR: Section was not found in DOM after adding!`);
       }
     } catch (error) {
-      console.error(`[DEBUG_LOG] ERROR in addSection: ${error.message}`, error);
+      // console.error(`[DEBUG_LOG] ERROR in addSection: ${error.message}`, error);
       return; // Exit the function if an error occurs
     }
 
     // Only proceed if div was successfully created
     if (!div) {
-      console.error(`[DEBUG_LOG] ERROR: div was not created successfully`);
+      // console.error(`[DEBUG_LOG] ERROR: div was not created successfully`);
       return;
     }
 
@@ -1032,28 +1231,55 @@
       const contentId = `content-${sectionIndex}`;
 
       setTimeout(() => {
-        const quill = new Quill(`#${editorId}`, {
-          theme: 'snow',
-          modules: {
-            toolbar: [
-              ['bold', 'italic', 'underline', 'strike'],
-              ['blockquote', 'code-block'],
-              [{ 'header': 1 }, { 'header': 2 }],
-              [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-              [{ 'script': 'sub' }, { 'script': 'super' }],
-              [{ 'indent': '-1' }, { 'indent': '+1' }],
-              ['link', 'image'],
-              ['clean']
-            ]
+        const editorElement = document.getElementById(editorId);
+        // First check if we already have a Quill instance for this editor in our array
+        if (!quillEditors[sectionIndex]) {
+          // Then check if the element already has a Quill instance attached to it
+          if (editorElement && !editorElement.querySelector('.ql-toolbar')) {
+            const quill = new Quill(`#${editorId}`, {
+              theme: 'snow',
+              modules: {
+                toolbar: [
+                  ['bold', 'italic', 'underline', 'strike'],
+                  ['blockquote', 'code-block'],
+                  [{ 'header': 1 }, { 'header': 2 }],
+                  [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                  [{ 'script': 'sub' }, { 'script': 'super' }],
+                  [{ 'indent': '-1' }, { 'indent': '+1' }],
+                  ['clean']
+                ]
+              }
+            });
+
+            quill.on('text-change', function() {
+              document.getElementById(contentId).value = quill.root.innerHTML;
+            });
+
+            // Store the Quill instance at the specific index instead of pushing it
+            quillEditors[sectionIndex] = quill;
+
+            // If there's initial content in the hidden input, render it properly
+            const contentInput = document.getElementById(contentId);
+            if (contentInput && contentInput.value) {
+              // Use clipboard.dangerouslyPasteHTML to properly render HTML content
+              // Create a temporary div to decode HTML entities
+              const tempDiv = document.createElement('div');
+              tempDiv.innerHTML = contentInput.value;
+              quill.clipboard.dangerouslyPasteHTML(0, tempDiv.innerHTML);
+            }
           }
-        });
-
-        quill.on('text-change', function() {
-          document.getElementById(contentId).value = quill.root.innerHTML;
-        });
-
-        quillEditors.push(quill);
-      }, 0);
+        } else if (quillEditors[sectionIndex]) {
+          // If we already have a Quill instance, make sure the content is properly rendered
+          const contentInput = document.getElementById(contentId);
+          if (contentInput && contentInput.value) {
+            // Use clipboard.dangerouslyPasteHTML to properly render HTML content
+            // Create a temporary div to decode HTML entities
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = contentInput.value;
+            quillEditors[sectionIndex].clipboard.dangerouslyPasteHTML(0, tempDiv.innerHTML);
+          }
+        }
+      }, 500); // Increased delay to ensure DOM is fully ready
     }
 
     sectionIndex++;
@@ -1061,20 +1287,20 @@
 
   // Function to add a new entry to an existing section
   function addEntry(sectionId) {
-    console.log(`[DEBUG_LOG] Adding entry to section: ${sectionId}`);
+    // console.log(`[DEBUG_LOG] Adding entry to section: ${sectionId}`);
     const sectionDiv = document.getElementById(sectionId);
     if (!sectionDiv) {
-      console.error(`[DEBUG_LOG] ERROR: Section div not found with id: ${sectionId}`);
+      // console.error(`[DEBUG_LOG] ERROR: Section div not found with id: ${sectionId}`);
       return;
     }
 
     const type = sectionDiv.dataset.type;
     const sectionIndex = sectionDiv.dataset.sectionIndex;
-    console.log(`[DEBUG_LOG] Section type: ${type}, index: ${sectionIndex}`);
+    // console.log(`[DEBUG_LOG] Section type: ${type}, index: ${sectionIndex}`);
 
     // Don't allow adding entries to custom sections
     if (type === 'custom') {
-      console.log(`[DEBUG_LOG] Not adding entry to custom section`);
+      // console.log(`[DEBUG_LOG] Not adding entry to custom section`);
       return;
     }
 
@@ -1082,90 +1308,90 @@
       // Find the items container
       const itemsContainer = sectionDiv.querySelector('.section-items');
       if (!itemsContainer) {
-        console.error(`[DEBUG_LOG] ERROR: Items container not found in section: ${sectionId}`);
-        console.log(`[DEBUG_LOG] Section div HTML:`, sectionDiv.outerHTML);
+        // console.error(`[DEBUG_LOG] ERROR: Items container not found in section: ${sectionId}`);
+        // console.log(`[DEBUG_LOG] Section div HTML:`, sectionDiv.outerHTML);
         return;
       }
-      console.log(`[DEBUG_LOG] Found items container:`, itemsContainer);
+      // console.log(`[DEBUG_LOG] Found items container:`, itemsContainer);
 
       // Get the current number of items
       const itemElements = itemsContainer.querySelectorAll('.section-item');
       const itemCount = itemElements.length;
-      console.log(`[DEBUG_LOG] Current item count: ${itemCount}`);
+      // console.log(`[DEBUG_LOG] Current item count: ${itemCount}`);
 
       if (itemCount > 0) {
-        console.log(`[DEBUG_LOG] Last item element:`, itemElements[itemCount - 1]);
+        // console.log(`[DEBUG_LOG] Last item element:`, itemElements[itemCount - 1]);
       }
 
       // Create a new item based on the section type
       const template = document.getElementById(`${type}-item-template`);
-      console.log(`[DEBUG_LOG] Template for ${type} item:`, template);
+      // console.log(`[DEBUG_LOG] Template for ${type} item:`, template);
 
       if (!template) {
-        console.error(`[DEBUG_LOG] ERROR: Template not found for type: ${type}-item-template`);
+        // console.error(`[DEBUG_LOG] ERROR: Template not found for type: ${type}-item-template`);
         return;
       }
 
-      console.log(`[DEBUG_LOG] Cloning template for ${type} item...`);
+      // console.log(`[DEBUG_LOG] Cloning template for ${type} item...`);
       const clone = document.importNode(template.content, true);
-      console.log(`[DEBUG_LOG] Successfully cloned template content:`, clone);
+      // console.log(`[DEBUG_LOG] Successfully cloned template content:`, clone);
 
       // Create a temporary div to hold the cloned content
       const tempDiv = document.createElement('div');
       tempDiv.appendChild(clone);
-      console.log(`[DEBUG_LOG] Added clone to temporary div`);
+      // console.log(`[DEBUG_LOG] Added clone to temporary div`);
 
       // Replace {index} and {itemIndex} placeholders
-      console.log(`[DEBUG_LOG] Replacing {index} with ${sectionIndex} and {itemIndex} with ${itemCount}`);
+      // console.log(`[DEBUG_LOG] Replacing {index} with ${sectionIndex} and {itemIndex} with ${itemCount}`);
       const html = tempDiv.innerHTML
         .replace(/{index}/g, sectionIndex)
         .replace(/{itemIndex}/g, itemCount);
 
-      console.log(`[DEBUG_LOG] HTML after replacement:`, html.substring(0, 100) + '...');
+      // console.log(`[DEBUG_LOG] HTML after replacement:`, html.substring(0, 100) + '...');
 
       // Append the HTML directly to the items container
       const tempContainer = document.createElement('div');
       tempContainer.innerHTML = html;
-      console.log(`[DEBUG_LOG] Created temp container with HTML`);
+      // console.log(`[DEBUG_LOG] Created temp container with HTML`);
 
       // Make sure we're appending the section-item element
       const sectionItem = tempContainer.querySelector('.section-item');
       if (sectionItem) {
-        console.log(`[DEBUG_LOG] Found section-item element in temp container:`, sectionItem);
-        console.log(`[DEBUG_LOG] Appending section item to items container. Container children before: ${itemsContainer.children.length}`);
+        // console.log(`[DEBUG_LOG] Found section-item element in temp container:`, sectionItem);
+        // console.log(`[DEBUG_LOG] Appending section item to items container. Container children before: ${itemsContainer.children.length}`);
         itemsContainer.appendChild(sectionItem);
-        console.log(`[DEBUG_LOG] Section item appended. Container children after: ${itemsContainer.children.length}`);
+        // console.log(`[DEBUG_LOG] Section item appended. Container children after: ${itemsContainer.children.length}`);
 
         // Verify the item was added correctly
         const newItemElements = itemsContainer.querySelectorAll('.section-item');
         if (newItemElements.length > itemCount) {
-          console.log(`[DEBUG_LOG] Item was successfully added. New count: ${newItemElements.length}`);
-          console.log(`[DEBUG_LOG] New item:`, newItemElements[newItemElements.length - 1]);
+          // console.log(`[DEBUG_LOG] Item was successfully added. New count: ${newItemElements.length}`);
+          // console.log(`[DEBUG_LOG] New item:`, newItemElements[newItemElements.length - 1]);
         } else {
-          console.error(`[DEBUG_LOG] ERROR: Item was not added correctly. Expected count: ${itemCount + 1}, Actual: ${newItemElements.length}`);
+          // console.error(`[DEBUG_LOG] ERROR: Item was not added correctly. Expected count: ${itemCount + 1}, Actual: ${newItemElements.length}`);
         }
       } else {
         // Fallback: append the first child if section-item not found
-        console.warn(`[DEBUG_LOG] WARNING: Section item not found in temp container, using fallback`);
-        console.log(`[DEBUG_LOG] Temp container HTML:`, tempContainer.innerHTML);
-        console.log(`[DEBUG_LOG] Appending first child:`, tempContainer.firstChild);
+        // console.warn(`[DEBUG_LOG] WARNING: Section item not found in temp container, using fallback`);
+        // console.log(`[DEBUG_LOG] Temp container HTML:`, tempContainer.innerHTML);
+        // console.log(`[DEBUG_LOG] Appending first child:`, tempContainer.firstChild);
         itemsContainer.appendChild(tempContainer.firstChild);
 
         // Verify the item was added correctly
         const newItemElements = itemsContainer.querySelectorAll('.section-item');
         if (newItemElements.length > itemCount) {
-          console.log(`[DEBUG_LOG] Item was successfully added using fallback. New count: ${newItemElements.length}`);
+          // console.log(`[DEBUG_LOG] Item was successfully added using fallback. New count: ${newItemElements.length}`);
         } else {
-          console.error(`[DEBUG_LOG] ERROR: Item was not added correctly using fallback. Expected count: ${itemCount + 1}, Actual: ${newItemElements.length}`);
+          // console.error(`[DEBUG_LOG] ERROR: Item was not added correctly using fallback. Expected count: ${itemCount + 1}, Actual: ${newItemElements.length}`);
         }
       }
 
       // Update delete buttons visibility
       updateDeleteButtonsVisibility(sectionDiv);
 
-      console.log('[DEBUG_LOG] New entry added successfully');
+      // console.log('[DEBUG_LOG] New entry added successfully');
     } catch (error) {
-      console.error(`[DEBUG_LOG] ERROR in addEntry: ${error.message}`, error);
+      // console.error(`[DEBUG_LOG] ERROR in addEntry: ${error.message}`, error);
     }
   }
 
@@ -1548,294 +1774,3 @@
     });
   });
 </script>
-
-<style>
-  /* Page Layout */
-  .portfolio-form {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 2rem;
-    background-color: #FFFFFF;
-    border-radius: 0.5rem;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  }
-
-  h1, h2 {
-    color: #1F2937;
-    text-align: center;
-    margin-bottom: 1rem;
-  }
-
-  p {
-    text-align: center;
-    color: #4B5563;
-    margin-bottom: 2rem;
-  }
-
-  /* Form Elements */
-  .form-group {
-    margin-bottom: 1.5rem;
-  }
-
-  .form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 600;
-    color: #1F2937;
-  }
-
-  .form-group input[type="text"],
-  .form-group input[type="email"],
-  .form-group input[type="url"],
-  .form-group input[type="date"],
-  .form-group textarea {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #E5E7EB;
-    border-radius: 0.375rem;
-    font-family: inherit;
-    transition: border-color 0.2s ease;
-  }
-
-  .form-group input[type="text"]:focus,
-  .form-group input[type="email"]:focus,
-  .form-group input[type="url"]:focus,
-  .form-group input[type="date"]:focus,
-  .form-group textarea:focus {
-    border-color: #3B82F6;
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-  }
-
-  .form-group input[type="checkbox"] {
-    margin-right: 0.5rem;
-  }
-
-  /* Checkbox group styling */
-  .checkbox-group label {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
-  }
-
-  .checkbox-group input[type="checkbox"] {
-    margin: 0;
-    width: auto;
-    flex-shrink: 0;
-  }
-
-  .checkbox-group span {
-    margin: 0;
-    padding: 0;
-    display: inline-block;
-  }
-
-  /* Section Styling */
-  .section {
-    margin-bottom: 2rem;
-    padding: 1.5rem;
-    border: 1px solid #E5E7EB;
-    border-radius: 0.5rem;
-    background-color: #f8fafc;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    transition: box-shadow 0.2s ease;
-  }
-
-  .section:hover {
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
-
-  .section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 2px solid #E5E7EB;
-  }
-
-  .section-header h3 {
-    color: #3B82F6;
-    margin-bottom: 0;
-  }
-
-  .item-header {
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 1rem;
-  }
-
-  .section-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-    margin-bottom: 2rem;
-    justify-content: center;
-  }
-
-  .section-items {
-    margin-bottom: 1.5rem;
-  }
-
-  .section-item {
-    margin-bottom: 1.5rem;
-    padding: 1.5rem;
-    background-color: #FFFFFF;
-    border-radius: 0.375rem;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-  }
-
-  .section-item hr {
-    margin: 1.5rem 0;
-    border: 0;
-    border-top: 1px solid #E5E7EB;
-  }
-
-  /* Buttons */
-  .btn-primary, .btn-secondary {
-    padding: 0.75rem 1.5rem;
-    font-weight: 600;
-    border-radius: 0.375rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    text-decoration: none;
-    display: inline-block;
-  }
-
-  .btn-primary {
-    background-color: #3B82F6;
-    color: #FFFFFF;
-    border: none;
-  }
-
-  .btn-primary:hover {
-    background-color: #2563EB;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
-
-  .btn-secondary {
-    background-color: #FFFFFF;
-    color: #3B82F6;
-    border: 1px solid #3B82F6;
-  }
-
-  .btn-secondary:hover {
-    background-color: #EFF6FF;
-    transform: translateY(-1px);
-  }
-
-  .btn-delete {
-    padding: 0.5rem 0.75rem;
-    font-weight: 600;
-    border-radius: 0.375rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    text-decoration: none;
-    display: inline-block;
-    background-color: #EF4444;
-    color: #FFFFFF;
-    border: none;
-    font-size: 0.875rem;
-  }
-
-  .btn-delete:hover {
-    background-color: #DC2626;
-    transform: translateY(-1px);
-  }
-
-  .delete-section {
-    margin-left: 1rem;
-  }
-
-  .delete-item {
-    margin-bottom: 0.5rem;
-  }
-
-  .btn-arrow {
-    padding: 0.3rem 0.5rem;
-    font-weight: 600;
-    border-radius: 0.375rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    text-decoration: none;
-    display: inline-block;
-    background-color: #3B82F6;
-    color: #FFFFFF;
-    border: none;
-    font-size: 0.875rem;
-    margin-right: 0.25rem;
-  }
-
-  .btn-arrow:hover {
-    background-color: #2563EB;
-    transform: translateY(-1px);
-  }
-
-  .section-controls, .item-controls {
-    display: flex;
-    align-items: center;
-  }
-
-  .page-selector {
-    margin-right: 10px;
-  }
-
-  .page-selector select {
-    padding: 0.3rem;
-    border: none;
-    border-radius: 0.375rem;
-    font-size: 0.875rem;
-  }
-
-  .add-entry-btn {
-    margin: 1rem 0 1.5rem;
-    display: block;
-    width: auto;
-  }
-
-  button[type="submit"] {
-    display: block;
-    width: 100%;
-    max-width: 300px;
-    margin: 2rem auto 0;
-    padding: 1rem;
-    font-size: 1.1rem;
-  }
-
-  /* Quill Editor */
-  .quill-editor {
-    height: 200px;
-    margin-bottom: 1.5rem;
-    border-radius: 0.375rem;
-  }
-
-  /* Error Message */
-  .error-container {
-    background-color: #FEE2E2;
-    border: 1px solid #EF4444;
-    border-radius: 0.375rem;
-    padding: 1rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .error-message {
-    color: #B91C1C;
-    margin-bottom: 0;
-  }
-
-  /* Responsive Adjustments */
-  @media (max-width: 768px) {
-    .portfolio-form {
-      padding: 1.5rem;
-    }
-
-    .section-buttons {
-      flex-direction: column;
-    }
-
-    .btn-secondary {
-      width: 100%;
-    }
-  }
-</style>
