@@ -86,7 +86,7 @@ app.use("/users/login", (req, res, next) => {
     // once users profile page exists we should change this to user's profile 'portfolio/users/_id'
   } else {
     //req.method = 'POST';  // not needed since it will be a POST coming from the form
-    console.log("middleware /users/login");
+    // console.log("middleware /users/login");
     next();
   }
 });

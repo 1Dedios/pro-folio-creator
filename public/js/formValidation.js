@@ -45,7 +45,7 @@ if (signupForm) {
       }
 
       // SUCCESS - redirect
-      window.location = "/users/login";
+      window.location = "/users/profile";
     } catch (e) {
       const error = document.createElement("p");
       error.className = "form-client-error";

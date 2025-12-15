@@ -31,14 +31,9 @@
 
 ## How To Use
 
-> **Note:**
-> The app does require an .env.local file at root of project with an email and app password to contact portfolio owners through their portfolios.
-
 From your command line:
 
 ```bash
-# Clone this repository
-$ git clone https://github.com/1Dedios/pro-folio-creator
 
 # Go into the repository
 $ cd pro-folio-creator
@@ -46,8 +41,12 @@ $ cd pro-folio-creator
 # Install dependencies
 $ npm install
 
+#Run Seed Script
+$ npm run seed
+
 # Run the app
 $ npm start
+
 ```
 
 > **Note**

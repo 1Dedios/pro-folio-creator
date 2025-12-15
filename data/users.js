@@ -21,8 +21,8 @@ const validateUsername = (username) => {
 
 // Create a new user
 export const createUser = async (username, email, password) => {
-  username = validateUsername(username);
-  email = validateEmail(email);
+  username = validateUsername(username.toLowerCase());
+  email = validateEmail(email.toLowerCase());
   password = validatePassword(password);
 
   // Check if username or email already exists

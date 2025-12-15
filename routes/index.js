@@ -7,17 +7,6 @@ import privateRoutes from "./private.js";
 
 const apiRouter = express.Router();
 
-// User routes
-// moved to routes/users.js
-/*router.get('/users/:id', async (req, res) => {
-  try {
-    const user = await users.getUserById(req.params.id);
-    res.json(user);
-  } catch (e) {
-    res.status(404).json({ error: e });
-  }
-});*/
-
 // Theme routes
 apiRouter.get("/themes", async (req, res) => {
   try {
@@ -56,7 +45,8 @@ apiRouter.get("/themes/:id", async (req, res) => {
     const theme = await themes.getThemeById(req.params.id);
     res.json(theme);
   } catch (e) {
-    res.status(404).json({ error: e });
+    //res.status(404).json({ error: e });
+    return res.status(404).render('error', {title: 'Page Not Found', error: 'Page Not Found'});
   }
 });
 
@@ -121,7 +111,8 @@ apiRouter.get("/portfolios/:id", async (req, res) => {
     const portfolio = await portfolios.getPortfolioById(req.params.id);
     res.json(portfolio);
   } catch (e) {
-    res.status(404).json({ error: e });
+    //res.status(404).json({ error: e });
+    return res.status(404).render('error', {title: 'Page Not Found', error: e});
   }
 });
 
@@ -138,12 +129,16 @@ apiRouter.post("/portfolios/:id/activate", async (req, res) => {
     // verify portfolio exists and is owned by this user
     const portfolio = await portfolios.getPortfolioById(portfolioId);
     if (!portfolio)
-      return res.status(404).json({ error: "Portfolio not found" });
+      //return res.status(404).json({ error: "Portfolio not found" });
+      return res.status(404).render('error', {title: 'Page Not Found', error: 'Page Not Found'});
+
 
     // owner check (ownerId may be ObjectId; convert to string)
     if (String(portfolio.ownerId) !== String(userId)) {
       console.warn("Activate attempt by non-owner", { portfolioId, userId });
-      return res.status(403).json({ error: "Not authorized" });
+      //return res.status(403).json({ error: "Not authorized" });
+      return res.status(403).render('error', {title: 'Not Authorized', error: 'Not Authorized'});
+
     }
 
     // update user's active portfolio
@@ -218,7 +213,8 @@ const constructorMethod = (app) => {
   app.use("/contact-form", contactFormRoute);
 
   app.use((req, res) => {
-    res.status(404).json({ error: "Not found" });
+    //res.status(404).json({ error: "Not found" });
+    return res.status(404).render('error', {title: 'Page Not Found', error: 'Page Not Found'});
   });
 };
 
